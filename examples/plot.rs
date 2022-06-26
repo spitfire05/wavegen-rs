@@ -1,7 +1,7 @@
-use std::{path::Path, f32::consts::PI};
+use std::{f32::consts::PI, path::Path};
 
 use plotters::prelude::*;
-use wavy::{Waveform, Sine};
+use wavy::{Sine, Waveform};
 
 #[macro_export]
 macro_rules! foo {
@@ -16,21 +16,39 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sample_rate = 150.0;
 
     draw(
-    "sine.png",
-    "Sine",
-    Waveform::<f32>::with_components(sample_rate, vec![Box::new(Sine::with_frequency(1.0))]).into_iter().enumerate().map(|(i, x)| (i as f32 / sample_rate, x)).take(sample_rate as usize)
-)?;
+        "sine.png",
+        "Sine",
+        Waveform::<f32>::with_components(sample_rate, vec![Sine::with_frequency(1.0).build()])
+            .into_iter()
+            .enumerate()
+            .map(|(i, x)| (i as f32 / sample_rate, x))
+            .take(sample_rate as usize),
+    )?;
 
     draw(
-    "sine_double.png",
-    "Sines",
-    Waveform::<f32>::with_components(sample_rate, vec![Box::new(Sine::with_frequency(1.0)), Box::new(Sine::new(1.0, 1.0, PI / 2.0, 0.0))]).into_iter().enumerate().map(|(i, x)| (i as f32 / sample_rate, x)).take(sample_rate as usize)
-)?;
-    
+        "sine_double.png",
+        "Sines",
+        Waveform::<f32>::with_components(
+            sample_rate,
+            vec![
+                Sine::with_frequency(1.0).build(),
+                Sine::new(1.0, 1.0, PI / 2.0, 0.0).build(),
+            ],
+        )
+        .into_iter()
+        .enumerate()
+        .map(|(i, x)| (i as f32 / sample_rate, x))
+        .take(sample_rate as usize),
+    )?;
+
     Ok(())
 }
 
-fn draw<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(path: P, label: &str, iter: I) -> Result<(), Box<dyn std::error::Error>> {
+fn draw<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
+    path: P,
+    label: &str,
+    iter: I,
+) -> Result<(), Box<dyn std::error::Error>> {
     let root = BitMapBackend::new(&path, (640, 480)).into_drawing_area();
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
@@ -43,10 +61,7 @@ fn draw<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(path: P, label: &str
     chart.configure_mesh().draw()?;
 
     chart
-        .draw_series(LineSeries::new(
-            iter,
-            &RED,
-        ))?
+        .draw_series(LineSeries::new(iter, &RED))?
         .label(label)
         .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
 

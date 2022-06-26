@@ -1,26 +1,34 @@
 use core::marker::PhantomData;
 
-use alloc::{vec, vec::Vec, boxed::Box};
+use alloc::{vec, vec::Vec};
 use num_traits::NumCast;
 
 use crate::PeriodicFunction;
 
 pub struct Waveform<BitDepth: Clone> {
     sample_rate: f32,
-    components: Vec<Box<dyn PeriodicFunction>>,
-    _phantom: PhantomData<BitDepth>
+    components: Vec<PeriodicFunction>,
+    _phantom: PhantomData<BitDepth>,
 }
 
 impl<BitDepth: Clone> Waveform<BitDepth> {
     pub fn new(sample_rate: f32) -> Self {
-        Waveform { sample_rate, components: vec![], _phantom: PhantomData }
+        Waveform {
+            sample_rate,
+            components: vec![],
+            _phantom: PhantomData,
+        }
     }
 
-    pub fn with_components(sample_rate: f32, components: Vec<Box<dyn PeriodicFunction>>) -> Self {
-        Waveform { sample_rate, components, _phantom: PhantomData }
+    pub fn with_components(sample_rate: f32, components: Vec<PeriodicFunction>) -> Self {
+        Waveform {
+            sample_rate,
+            components,
+            _phantom: PhantomData,
+        }
     }
 
-    pub fn add_component(&mut self, component: Box<dyn PeriodicFunction>) {
+    pub fn add_component(&mut self, component: PeriodicFunction) {
         self.components.push(component);
     }
 
@@ -35,9 +43,9 @@ impl<'a, BitDepth: Clone + NumCast> IntoIterator for &'a Waveform<BitDepth> {
     type IntoIter = WaveformIterator<'a, BitDepth>;
 
     fn into_iter(self) -> Self::IntoIter {
-        WaveformIterator{
+        WaveformIterator {
             inner: self,
-            time: 0.0
+            time: 0.0,
         }
     }
 }
@@ -52,7 +60,7 @@ impl<'a, BitDepth: Clone + NumCast> Iterator for WaveformIterator<'a, BitDepth> 
 
     fn next(&mut self) -> Option<Self::Item> {
         // TODO: normalize?
-        let sample: f32 = self.inner.components.iter().map(|x| x.sample(self.time)).sum();
+        let sample: f32 = self.inner.components.iter().map(|x| x(self.time)).sum();
         self.time += 1.0 / self.inner.sample_rate;
         NumCast::from(sample)
     }
@@ -60,14 +68,14 @@ impl<'a, BitDepth: Clone + NumCast> Iterator for WaveformIterator<'a, BitDepth> 
 
 #[cfg(test)]
 mod tests {
-    use alloc::{vec, vec::Vec, boxed::Box};
+    use alloc::{boxed::Box, vec, vec::Vec};
 
     use super::Waveform;
     use crate::Sine;
 
     #[test]
     pub fn create_and_sample_sine_waveform() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![Box::new(Sine::with_frequency(1.0))]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![Sine::with_frequency(1.0).build()]);
 
         let _samples = wf.into_iter().take(100).collect::<Vec<f32>>();
 
@@ -76,7 +84,7 @@ mod tests {
 
     #[test]
     pub fn sine_waveform_as_integers_has_amplitude_of_one() {
-        let wf = Waveform::<i32>::with_components(100.0, vec![Box::new(Sine::with_frequency(1.0))]);
+        let wf = Waveform::<i32>::with_components(100.0, vec![Sine::with_frequency(1.0).build()]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<i32>>();
 
