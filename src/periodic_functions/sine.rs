@@ -1,4 +1,4 @@
-use core::f32::consts::PI;
+use core::{f32::consts::PI, marker::PhantomData};
 
 use alloc::boxed::Box;
 use libm::sinf;
@@ -13,16 +13,7 @@ pub struct Sine {
 }
 
 impl Sine {
-    pub fn new(frequency: f32, amplitude: f32, phase: f32, dc_bias: f32) -> Self {
-        Sine {
-            frequency,
-            amplitude,
-            phase,
-            dc_bias,
-        }
-    }
-
-    pub fn with_frequency(frequency: f32) -> Self {
+    pub fn new(frequency: f32) -> Self {
         Sine {
             frequency,
             amplitude: 1.0,
@@ -31,14 +22,20 @@ impl Sine {
         }
     }
 
-    pub fn builder_with_frequency(mut self, frequency: f32) -> Self {
-        self.frequency = frequency;
+    pub fn with_amplitude(mut self, amplitude: f32) -> Self {
+        self.amplitude = amplitude;
 
         self
     }
 
-    pub fn builder_with_amplitude(mut self, amplitude: f32) -> Self {
-        self.amplitude = amplitude;
+    pub fn with_phase(mut self, phase: f32) -> Self {
+        self.phase = phase;
+
+        self
+    }
+
+    pub fn with_dc_bias(mut self, dc_bias: f32) -> Self {
+        self.dc_bias = dc_bias;
 
         self
     }
@@ -57,13 +54,8 @@ mod tests {
     use super::Sine;
 
     #[test]
-    fn create_sine() {
-        let _sine = Sine::with_frequency(0.0);
-    }
-
-    #[test]
     fn default_sine_has_amplitude_of_one() {
-        let sine = Sine::with_frequency(1.0).build();
+        let sine = Sine::new(1.0).build();
 
         let max = sine(0.25);
         let min = sine(0.75);
@@ -74,7 +66,7 @@ mod tests {
 
     #[test]
     fn dc_bias_affects_min_max_amplitude() {
-        let sine = Sine::new(1.0, 1.0, 0.0, 1.0).build();
+        let sine = Sine::new(1.0).with_dc_bias(1.0).build();
 
         let max = sine(0.25);
         let min = sine(0.75);
@@ -85,20 +77,12 @@ mod tests {
 
     #[test]
     fn phase_affects_min_max_amplitude_position() {
-        let sine = Sine::new(1.0, 1.0, PI, 0.0).build();
+        let sine = Sine::new(1.0).with_phase(PI).build();
 
         let max = sine(0.75);
         let min = sine(0.25);
 
         assert_eq!(max, 1.0);
         assert_eq!(min, -1.0);
-    }
-
-    #[test]
-    fn builder_test() {
-        let sine = Sine::new(0.0, 0.0, 0.0, 0.0)
-            .builder_with_amplitude(1.0)
-            .builder_with_frequency(50.0)
-            .build();
     }
 }

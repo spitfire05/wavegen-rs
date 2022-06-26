@@ -68,23 +68,16 @@ impl<'a, BitDepth: Clone + NumCast> Iterator for WaveformIterator<'a, BitDepth> 
 
 #[cfg(test)]
 mod tests {
-    use alloc::{boxed::Box, vec, vec::Vec};
+    use alloc::{vec, vec::Vec};
 
     use super::Waveform;
     use crate::Sine;
 
-    #[test]
-    pub fn create_and_sample_sine_waveform() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![Sine::with_frequency(1.0).build()]);
-
-        let _samples = wf.into_iter().take(100).collect::<Vec<f32>>();
-
-        let _foo = 0; // just a debug point
-    }
+    // TODO: needs more tests
 
     #[test]
     pub fn sine_waveform_as_integers_has_amplitude_of_one() {
-        let wf = Waveform::<i32>::with_components(100.0, vec![Sine::with_frequency(1.0).build()]);
+        let wf = Waveform::<i32>::with_components(100.0, vec![Sine::new(1.0).build()]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<i32>>();
 

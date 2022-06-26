@@ -18,7 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     draw(
         "sine.png",
         "Sine",
-        Waveform::<f32>::with_components(sample_rate, vec![Sine::with_frequency(1.0).build()])
+        Waveform::<f32>::with_components(sample_rate, vec![Sine::new(1.0).build()])
             .into_iter()
             .enumerate()
             .map(|(i, x)| (i as f32 / sample_rate, x))
@@ -31,8 +31,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Waveform::<f32>::with_components(
             sample_rate,
             vec![
-                Sine::with_frequency(1.0).build(),
-                Sine::new(1.0, 1.0, PI / 2.0, 0.0).build(),
+                Sine::new(1.0).build(),
+                Sine::new(1.0).with_phase(PI / 2.0).build(),
             ],
         )
         .into_iter()
