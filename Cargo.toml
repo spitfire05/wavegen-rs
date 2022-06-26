@@ -9,3 +9,6 @@ edition = "2021"
 libm="0.2"
 wee_alloc="0.4"
 num-traits = { version = "0.2", default-features = false }
+
+[dev-dependencies]
+plotters = "^0.3.1"

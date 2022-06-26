@@ -1,23 +1,27 @@
 use core::marker::PhantomData;
 
 use alloc::{vec, vec::Vec, boxed::Box};
-use num_traits::{Bounded, NumCast, AsPrimitive};
+use num_traits::NumCast;
 
 use crate::PeriodicFunction;
 
-pub struct Waveform<BitDepth> {
+pub struct Waveform<BitDepth: Clone> {
     sample_rate: f32,
     components: Vec<Box<dyn PeriodicFunction>>,
     _phantom: PhantomData<BitDepth>
 }
 
-impl<BitDepth> Waveform<BitDepth> {
+impl<BitDepth: Clone> Waveform<BitDepth> {
     pub fn new(sample_rate: f32) -> Self {
         Waveform { sample_rate, components: vec![], _phantom: PhantomData }
     }
 
     pub fn with_components(sample_rate: f32, components: Vec<Box<dyn PeriodicFunction>>) -> Self {
         Waveform { sample_rate, components, _phantom: PhantomData }
+    }
+
+    pub fn add_component(&mut self, component: Box<dyn PeriodicFunction>) {
+        self.components.push(component);
     }
 
     pub fn get_sample_rate(&self) -> f32 {
@@ -71,7 +75,7 @@ mod tests {
     }
 
     #[test]
-    pub fn sine_waveform_as_integers_has_amplited_of_one() {
+    pub fn sine_waveform_as_integers_has_amplitude_of_one() {
         let wf = Waveform::<i32>::with_components(100.0, vec![Box::new(Sine::with_frequency(1.0))]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<i32>>();

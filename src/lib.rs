@@ -11,3 +11,5 @@ mod waveform;
 
 pub use periodic_functions::PeriodicFunction;
 pub use periodic_functions::sine::Sine;
+
+pub use waveform::Waveform;
