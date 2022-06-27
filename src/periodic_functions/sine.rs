@@ -1,12 +1,12 @@
-use core::f32::consts::PI;
+use core::f64::consts::PI;
 
 use alloc::boxed::Box;
-use libm::sinf;
+use libm::sin;
 
 use crate::PeriodicFunction;
 
-pub fn sine_builder(frequency: f32, amplitude: f32, phase: f32) -> PeriodicFunction {
-    Box::new(move |t| sinf((2.0 * PI * frequency * t) + phase) * amplitude)
+pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    Box::new(move |t| sin((2.0 * PI * frequency * t) + phase) * amplitude)
 }
 
 /// Builder macro for Sine [PeriodicFunction].
@@ -31,7 +31,7 @@ pub fn sine_builder(frequency: f32, amplitude: f32, phase: f32) -> PeriodicFunct
 ///
 /// 50 Hz sine of amplitude 20 and phase shift of half a turn
 /// ```
-/// use core::f32::consts::PI;
+/// use core::f64::consts::PI;
 /// use wavy::sine;
 /// 
 /// let sine = sine!(50, 20, PI);
@@ -45,17 +45,17 @@ macro_rules! sine {
         sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sine::sine_builder($frequency as f32, $amplitude as f32, $phase as f32)
+        $crate::periodic_functions::sine::_sine($frequency as f64, $amplitude as f64, $phase as f64)
     };
 }
 
 #[cfg(test)]
 mod tests {
-    use core::f32::consts::PI;
+    use core::f64::consts::PI;
 
     use float_cmp::approx_eq;
 
-    const EPS: f32 = 1e-3;
+    const EPS: f64 = 1e-3;
 
     #[test]
     fn default_sine_has_amplitude_of_one_and_no_phase_shift() {
@@ -65,9 +65,9 @@ mod tests {
         let min = sine(0.75);
         let zero = sine(0.5);
 
-        assert!(approx_eq!(f32, max, 1.0, epsilon=EPS));
-        assert!(approx_eq!(f32, min, -1.0, epsilon=EPS));
-        assert!(approx_eq!(f32, zero, 0.0, epsilon=EPS));
+        assert!(approx_eq!(f64, max, 1.0, epsilon=EPS));
+        assert!(approx_eq!(f64, min, -1.0, epsilon=EPS));
+        assert!(approx_eq!(f64, zero, 0.0, epsilon=EPS));
     }
 
     #[test]
@@ -78,8 +78,8 @@ mod tests {
         let min = sine(0.25);
         let zero = sine(0.5);
 
-        assert!(approx_eq!(f32, max, 1.0, epsilon=EPS));
-        assert!(approx_eq!(f32, min, -1.0, epsilon=EPS));
-        assert!(approx_eq!(f32, zero, 0.0, epsilon=EPS));
+        assert!(approx_eq!(f64, max, 1.0, epsilon=EPS));
+        assert!(approx_eq!(f64, min, -1.0, epsilon=EPS));
+        assert!(approx_eq!(f64, zero, 0.0, epsilon=EPS));
     }
 }

@@ -13,5 +13,5 @@ use alloc::boxed::Box;
 
 pub use waveform::Waveform;
 
-/// Type alias defining a periodic function (f32 -> f32 map)
-pub type PeriodicFunction = Box<dyn Fn(f32) -> f32>;
+/// Type alias defining a periodic function (f64 -> f64 map)
+pub type PeriodicFunction = Box<dyn Fn(f64) -> f64>;

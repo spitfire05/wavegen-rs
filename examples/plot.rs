@@ -12,7 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Waveform::<f32>::with_components(sample_rate, vec![sine!(1.0)])
             .into_iter()
             .enumerate()
-            .map(|(i, x)| (i as f32 / sample_rate, x))
+            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
             .take(sample_rate as usize),
     )?;
 
@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .into_iter()
         .enumerate()
-        .map(|(i, x)| (i as f32 / sample_rate, x))
+        .map(|(i, x)| (i as f32 / sample_rate as f32, x))
         .take(sample_rate as usize),
     )?;
 

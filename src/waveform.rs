@@ -7,7 +7,7 @@ use crate::PeriodicFunction;
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
 pub struct Waveform<T: Clone> {
-    sample_rate: f32,
+    sample_rate: f64,
     components: Vec<PeriodicFunction>,
     _phantom: PhantomData<T>,
 }
@@ -25,7 +25,7 @@ impl<T: Clone> Waveform<T> {
     /// 
     /// assert!(wf.into_iter().take(100).all(|y| y == 0.0));
     /// ```
-    pub fn new(sample_rate: f32) -> Self {
+    pub fn new(sample_rate: f64) -> Self {
         Waveform {
             sample_rate,
             components: vec![],
@@ -42,7 +42,7 @@ impl<T: Clone> Waveform<T> {
     /// 
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: f32, components: Vec<PeriodicFunction>) -> Self {
+    pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
         Waveform {
             sample_rate,
             components,
@@ -78,7 +78,7 @@ impl<T: Clone> Waveform<T> {
     /// 
     /// assert_eq!(42.0, wf.get_sample_rate());
     /// ```
-    pub fn get_sample_rate(&self) -> f32 {
+    pub fn get_sample_rate(&self) -> f64 {
         self.sample_rate
     }
 
@@ -113,7 +113,7 @@ impl<'a, T: Clone + NumCast> IntoIterator for &'a Waveform<T> {
 
 pub struct WaveformIterator<'a, T: Clone> {
     inner: &'a Waveform<T>,
-    time: f32,
+    time: f64,
 }
 
 impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
@@ -121,7 +121,7 @@ impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         // TODO: normalize?
-        let sample: f32 = self.inner.components.iter().map(|x| x(self.time)).sum();
+        let sample: f64 = self.inner.components.iter().map(|x| x(self.time)).sum();
         self.time += 1.0 / self.inner.sample_rate;
         NumCast::from(sample)
     }
