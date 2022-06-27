@@ -21,15 +21,19 @@ let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
 ## Show me some examples!
 
 * Simple sine
+
 ![Sine plot](img/sine.png)
 
 * Two superposed phase-shifted sines
+
 ![Superposed sines plot](img/sine_double.png)
 
 * Sawtooth
+
 ![Sawtooth plot](img/sawtooth.png)
 
 * Superposition of sine + sawtooth
+
 ![Sine and sawtooth superposed](img/sawtooth_sinesised.png)
 
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
