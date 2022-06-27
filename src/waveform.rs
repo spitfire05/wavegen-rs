@@ -129,14 +129,15 @@ impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
 #[cfg(test)]
 mod tests {
     use alloc::{vec, vec::Vec};
+    use float_cmp::approx_eq;
 
     use super::Waveform;
-    use crate::{dc_bias, sine};
+    use crate::{dc_bias, sine, sawtooth};
 
-    // TODO: needs more tests
+    const EPS: f32 = 1e-3;
 
     #[test]
-    pub fn sine_waveform_has_default_amplitude_of_one() {
+    fn sine_waveform_has_default_amplitude_of_one() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1)]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
@@ -146,7 +147,7 @@ mod tests {
     }
 
     #[test]
-    pub fn sine_waveform_as_integers_has_amplitude_of_one() {
+    fn sine_waveform_as_integers_has_amplitude_of_one() {
         let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1)]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<i32>>();
@@ -156,12 +157,30 @@ mod tests {
     }
 
     #[test]
-    pub fn sine_waveform_with_bias_has_correct_amplitude() {
+    fn sine_waveform_with_bias_has_correct_amplitude() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5)]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
 
         assert_eq!(samples[25], 6.0);
         assert_eq!(samples[75], 4.0);
+    }
+
+    #[test]
+    fn default_sine_wavefrom_has_no_bias() {
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(10)]);
+
+        let bias = wf.into_iter().take(100).sum::<f32>() / 100.0;
+
+        assert!(approx_eq!(f32, bias, 0.0, epsilon=EPS));
+    }
+
+    #[test]
+    fn default_sawtooth_wavefrom_has_no_bias() {
+        let wf = Waveform::<f32>::with_components(100.0, vec![sawtooth!(1)]);
+
+        let bias = wf.into_iter().take(100).sum::<f32>() / 100.0;
+
+        assert!(approx_eq!(f32, bias, 0.0, epsilon=1e-2));
     }
 }
