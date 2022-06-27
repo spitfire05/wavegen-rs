@@ -5,13 +5,13 @@ use num_traits::NumCast;
 
 use crate::PeriodicFunction;
 
-pub struct Waveform<BitDepth: Clone> {
+pub struct Waveform<T: Clone> {
     sample_rate: f32,
     components: Vec<PeriodicFunction>,
-    _phantom: PhantomData<BitDepth>,
+    _phantom: PhantomData<T>,
 }
 
-impl<BitDepth: Clone> Waveform<BitDepth> {
+impl<T: Clone> Waveform<T> {
     pub fn new(sample_rate: f32) -> Self {
         Waveform {
             sample_rate,
@@ -37,10 +37,10 @@ impl<BitDepth: Clone> Waveform<BitDepth> {
     }
 }
 
-impl<'a, BitDepth: Clone + NumCast> IntoIterator for &'a Waveform<BitDepth> {
-    type Item = BitDepth;
+impl<'a, T: Clone + NumCast> IntoIterator for &'a Waveform<T> {
+    type Item = T;
 
-    type IntoIter = WaveformIterator<'a, BitDepth>;
+    type IntoIter = WaveformIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         WaveformIterator {
@@ -50,13 +50,13 @@ impl<'a, BitDepth: Clone + NumCast> IntoIterator for &'a Waveform<BitDepth> {
     }
 }
 
-pub struct WaveformIterator<'a, BitDepth: Clone> {
-    inner: &'a Waveform<BitDepth>,
+pub struct WaveformIterator<'a, T: Clone> {
+    inner: &'a Waveform<T>,
     time: f32,
 }
 
-impl<'a, BitDepth: Clone + NumCast> Iterator for WaveformIterator<'a, BitDepth> {
-    type Item = BitDepth;
+impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
+    type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
         // TODO: normalize?
@@ -71,9 +71,19 @@ mod tests {
     use alloc::{vec, vec::Vec};
 
     use super::Waveform;
-    use crate::Sine;
+    use crate::{Sine, dc_bias};
 
     // TODO: needs more tests
+
+    #[test]
+    pub fn sine_waveform_has_default_amplitude_of_one() {
+        let wf = Waveform::<f32>::with_components(100.0, vec![Sine::new(1.0).build()]);
+
+        let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
+
+        assert_eq!(samples[25], 1.0);
+        assert_eq!(samples[75], -1.0);
+    }
 
     #[test]
     pub fn sine_waveform_as_integers_has_amplitude_of_one() {
@@ -81,6 +91,17 @@ mod tests {
 
         let samples = wf.into_iter().take(100).collect::<Vec<i32>>();
 
-        assert_eq!(samples[25], 1)
+        assert_eq!(samples[25], 1);
+        assert_eq!(samples[75], -1);
+    }
+
+    #[test]
+    pub fn sine_waveform_with_bias_has_correct_amplitude() {
+        let wf = Waveform::<f32>::with_components(100.0, vec![Sine::new(1.0).build(), dc_bias(5.0)]);
+
+        let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
+
+        assert_eq!(samples[25], 6.0);
+        assert_eq!(samples[75], 4.0);
     }
 }

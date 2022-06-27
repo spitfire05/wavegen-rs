@@ -1,16 +1,8 @@
 use std::{f32::consts::PI, path::Path};
 
 use plotters::prelude::*;
-use wavy::{Sine, Waveform};
-
-#[macro_export]
-macro_rules! foo {
-    ( $ ($label:expr, $iter:expr),* ) => {
-        $(
-            draw("foo.png", label, $x)?
-        )*
-    };
-}
+use wavy::{Sine, Waveform, sine};
+use wavy::sinef;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sample_rate = 150.0;
@@ -18,7 +10,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     draw(
         "sine.png",
         "Sine",
-        Waveform::<f32>::with_components(sample_rate, vec![Sine::new(1.0).build()])
+        Waveform::<f32>::with_components(sample_rate, vec![sine!(1.0)])
             .into_iter()
             .enumerate()
             .map(|(i, x)| (i as f32 / sample_rate, x))
@@ -32,7 +24,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             sample_rate,
             vec![
                 Sine::new(1.0).build(),
-                Sine::new(1.0).with_phase(PI / 2.0).build(),
+                Sine::new(1.0).with_phase_shift(PI / 2.0).build(),
             ],
         )
         .into_iter()
