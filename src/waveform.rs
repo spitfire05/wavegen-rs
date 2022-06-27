@@ -5,6 +5,7 @@ use num_traits::NumCast;
 
 use crate::PeriodicFunction;
 
+/// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
 pub struct Waveform<T: Clone> {
     sample_rate: f32,
     components: Vec<PeriodicFunction>,
@@ -12,6 +13,18 @@ pub struct Waveform<T: Clone> {
 }
 
 impl<T: Clone> Waveform<T> {
+    
+    /// Initializes new empty [Waveform]
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use wavy::Waveform;
+    /// 
+    /// let wf = Waveform::<f32>::new(500.0);
+    /// 
+    /// assert!(wf.into_iter().take(100).all(|y| y == 0.0));
+    /// ```
     pub fn new(sample_rate: f32) -> Self {
         Waveform {
             sample_rate,
@@ -20,6 +33,15 @@ impl<T: Clone> Waveform<T> {
         }
     }
 
+    /// Initializes new [Waveform] with predefined components
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use wavy::{Waveform, sine, dc_bias};
+    /// 
+    /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
+    /// ```
     pub fn with_components(sample_rate: f32, components: Vec<PeriodicFunction>) -> Self {
         Waveform {
             sample_rate,
@@ -28,12 +50,51 @@ impl<T: Clone> Waveform<T> {
         }
     }
 
+    /// Ads a new component to existing [Waveform].
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use wavy::{Waveform, sine, dc_bias};
+    /// 
+    /// let mut wf = Waveform::<f32>::new(100.0);
+    /// wf.add_component(sine!(10));
+    /// wf.add_component(dc_bias!(5));
+    /// 
+    /// assert_eq!(2, wf.get_components_len());
+    /// ```
     pub fn add_component(&mut self, component: PeriodicFunction) {
         self.components.push(component);
     }
 
+    /// Getter for sample rate of a [Waveform].
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use wavy::Waveform;
+    /// 
+    /// let wf = Waveform::<f32>::new(42.0);
+    /// 
+    /// assert_eq!(42.0, wf.get_sample_rate());
+    /// ```
     pub fn get_sample_rate(&self) -> f32 {
         self.sample_rate
+    }
+
+    /// Returns number of components this [Waveform] consists of.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use wavy::{Waveform, sine, dc_bias};
+    /// 
+    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1), dc_bias!(5)]);
+    /// 
+    /// assert_eq!(2, wf.get_components_len());
+    /// ```
+    pub fn get_components_len(&self) -> usize {
+        self.components.len()
     }
 }
 
