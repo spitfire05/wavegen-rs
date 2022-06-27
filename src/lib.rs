@@ -4,13 +4,12 @@
 
 extern crate alloc;
 
-mod periodic_functions;
+#[doc(hidden)]
+pub mod periodic_functions;
+
 mod waveform;
 
 use alloc::boxed::Box;
-pub use periodic_functions::sine::Sine;
-pub use periodic_functions::bias::dc_bias;
-pub use periodic_functions::sine::sinef;
 
 pub use waveform::Waveform;
 

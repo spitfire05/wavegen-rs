@@ -1,8 +1,7 @@
 use std::{f32::consts::PI, path::Path};
 
 use plotters::prelude::*;
-use wavy::{Sine, Waveform, sine};
-use wavy::sinef;
+use wavy::{Waveform, sine};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sample_rate = 150.0;
@@ -23,8 +22,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Waveform::<f32>::with_components(
             sample_rate,
             vec![
-                Sine::new(1.0).build(),
-                Sine::new(1.0).with_phase_shift(PI / 2.0).build(),
+                sine!(1.0),
+                sine!(1.0, 1.0, PI / 2.0),
             ],
         )
         .into_iter()

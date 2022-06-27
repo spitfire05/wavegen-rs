@@ -71,13 +71,13 @@ mod tests {
     use alloc::{vec, vec::Vec};
 
     use super::Waveform;
-    use crate::{Sine, dc_bias};
+    use crate::{sine, dc_bias};
 
     // TODO: needs more tests
 
     #[test]
     pub fn sine_waveform_has_default_amplitude_of_one() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![Sine::new(1.0).build()]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1)]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
 
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     pub fn sine_waveform_as_integers_has_amplitude_of_one() {
-        let wf = Waveform::<i32>::with_components(100.0, vec![Sine::new(1.0).build()]);
+        let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1)]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<i32>>();
 
@@ -97,7 +97,7 @@ mod tests {
 
     #[test]
     pub fn sine_waveform_with_bias_has_correct_amplitude() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![Sine::new(1.0).build(), dc_bias(5.0)]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5)]);
 
         let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
 

@@ -5,94 +5,49 @@ use libm::sinf;
 
 use crate::PeriodicFunction;
 
-/// Builder for sine trygonometric function. Uses `libm::sinf` as backend generating sine.
-pub struct Sine {
-    frequency: f32,
-    amplitude: f32,
-    phase: f32,
-}
-
-impl Sine {
-    /// Constructor method for the builder. Takes frequency in *Hz* as an input.
-    /// Returns a builder for sine wave with amplitude of 1.0 and no phase shift.
-    /// 
-    /// # Examples
-    /// 
-    /// ```
-    /// use wavy::Sine;
-    /// 
-    /// // Simple 50 Hz sine wave
-    /// let sine = Sine::new(50.0).build();
-    /// ```
-    pub fn new(frequency: f32) -> Self {
-        Sine {
-            frequency,
-            amplitude: 1.0,
-            phase: 0.0
-        }
-    }
-
-    /// Adds amplitude to the sine builder.
-    /// 
-    /// # Examples
-    /// 
-    /// ```
-    /// use wavy::Sine;
-    /// 
-    /// // 50 Hz sine with an amplitude of 10.0
-    /// let sine = Sine::new(50.0).with_amplitude(10.0).build();
-    /// ```
-    pub fn with_amplitude(mut self, amplitude: f32) -> Self {
-        self.amplitude = amplitude;
-
-        self
-    }
-
-    /// Adds phase shift in *rad* to the sine builder.
-    /// 
-    /// # Examples
-    /// 
-    /// ```
-    /// use wavy::Sine;
-    /// use core::f32::consts::PI;
-    /// 
-    /// // 50 Hz sine with phase shift of half a turn (π *rad*)
-    /// let sine = Sine::new(50.0).with_phase_shift(PI).build();
-    /// ```
-    pub fn with_phase_shift(mut self, phase: f32) -> Self {
-        self.phase = phase;
-
-        self
-    }
-
-    /// Builds and returns the [PeriodicFunction]. Consumes the builder.
-    pub fn build(self) -> PeriodicFunction {
-        Box::new(move |t| {
-            sinf((2.0 * PI * self.frequency * t) + self.phase) * self.amplitude
-        })
-    }
-}
-
-/// Builder function for sine [PeriodicFunction]
-pub fn sinef(frequency: f32, amplitude: f32, phase: f32) -> PeriodicFunction {
+pub fn sine_builder(frequency: f32, amplitude: f32, phase: f32) -> PeriodicFunction {
     Box::new(move |t| sinf((2.0 * PI * frequency * t) + phase) * amplitude)
 }
 
-/// Macro simplyfying [sinef] calls.
+/// Builder macro for Sine [PeriodicFunction].
+/// 
+/// Takes up to 3 arguments - frequency {amplitude, {phase}}
+/// 
+/// # Examples
+/// 
+/// 50 Hz sine of amplitude 1 and no phase shift
+/// ```
+/// use wavy::sine;
+/// 
+/// let sine = sine!(50);
+/// ```
+/// 
+/// 50 Hz sine of amplitude 20 and no phase shift
+/// ```
+/// use wavy::sine;
+/// 
+/// let sine = sine!(50, 20);
+/// ```
+///
+/// 50 Hz sine of amplitude 20 and phase shift of half a turn
+/// ```
+/// use core::f32::consts::PI;
+/// use wavy::sine;
+/// 
+/// let sine = sine!(50, 20, PI);
+/// ```
 #[macro_export]
 macro_rules! sine {
     ($frequency:expr) => {
-        sinef($frequency, 1.0, 0.0)
+        sine!($frequency, 1.0, 0.0)
     };
     ($frequency:expr, $amplitude:expr) => {
-        sinef($frequency, $amplitude, 0.0)
+        sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        sinef($frequency, $amplitude, $phase)
+        $crate::periodic_functions::sine::sine_builder($frequency as f32, $amplitude as f32, $phase as f32)
     };
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -100,15 +55,11 @@ mod tests {
 
     use float_cmp::approx_eq;
 
-    use crate::periodic_functions::sine::sinef;
-
-    use super::Sine;
-
     const EPS: f32 = 1e-3;
 
     #[test]
     fn default_sine_has_amplitude_of_one_and_no_phase_shift() {
-        let sine = sinef(1.0, 0.0, 0.0);
+        let sine = sine!(1);
 
         let max = sine(0.25);
         let min = sine(0.75);
@@ -121,7 +72,7 @@ mod tests {
 
     #[test]
     fn phase_affects_min_max_amplitude_position() {
-        let sine = Sine::new(1.0).with_phase_shift(PI).build();
+        let sine = sine!(1, 1, PI);
 
         let max = sine(0.75);
         let min = sine(0.25);
