@@ -36,6 +36,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .take(sample_rate as usize),
     )?;
 
+    draw(
+        "sawtooth_sinesised.png",
+        "Sawtooth with sine",
+        Waveform::<f32>::with_components(sample_rate, vec![sawtooth!(2, 1, 0.0), sine!(50, 0.1)])
+            .into_iter()
+            .enumerate()
+            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
+            .take(sample_rate as usize),
+    )?;
+
     Ok(())
 }
 

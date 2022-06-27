@@ -40,7 +40,7 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// use core::f64::consts::PI;
 /// use wavy::sine;
 ///
-/// let sine = sine!(50, 20, PI);
+/// let sine = sine!(50, 20, 0.5);
 /// ```
 #[macro_export]
 macro_rules! sine {

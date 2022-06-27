@@ -1,4 +1,46 @@
-//! 'wavy' is a pure rust waveform generator.
+//! Rust waveform generator, with no_std support out of the box.
+//!
+//! # Quickstart
+//!
+//! ```
+//! use wavy::{Waveform, sine, dc_bias, sawtooth};
+//!
+//! // Define a Waveform with 200Hz sampling rate and three function components,
+//! // choosing f32 as the ouput type:
+//! let wf = Waveform::<f32>::with_components(
+//!     200.0,
+//!     vec![sine!(50, 10), sawtooth!(20), dc_bias!(-5)]
+//! );
+//!
+//! // Use Waveform as (almost) infinite iterator:
+//! let two_seconds_of_samples: Vec<f32> = wf.into_iter().take(400).collect();
+//! ```
+//!
+//! Look into macros section for a complete list of defined periodic functions and their constructors.
+//! 
+//! # Custom periodic functions
+//! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
+//! 
+//! ```
+//! use wavy::Waveform;
+//! 
+//! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(|x| x % 2 as f64)]);
+//! ```
+//! 
+//! # Note about Nyquist-Shannon rule enforcement
+//!
+//! As a rule of thumb in signal processing, the sampling frequency should be *at least* 2 times bigger than the highest frequency of sampled continous signal.
+//!
+//! This lib will **not** enforce the Nyquist-Shannon rule on the waveforms you create, therefore abominations like this are possible (altough not recommended):
+//!
+//! ```
+//! use wavy::{Waveform, sine};
+//!
+//! // 100 Hz sampling of 80 Hz sine... will not yield realistic results.
+//! let wf = Waveform::<f32>::with_components(100.0, vec![sine!(80)]);
+//! ```
+//!
+//! As it is often a case, it is you, the programmer, who's left in charge of making sure the input data makes sense.
 
 #![no_std]
 #![deny(missing_docs)]
