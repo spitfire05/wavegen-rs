@@ -18,7 +18,7 @@ impl<T: Clone> Waveform<T> {
     /// # Examples
     ///
     /// ```
-    /// use wavy::Waveform;
+    /// use wavegen::Waveform;
     ///
     /// let wf = Waveform::<f32>::new(500.0);
     ///
@@ -37,7 +37,7 @@ impl<T: Clone> Waveform<T> {
     /// # Examples
     ///
     /// ```
-    /// use wavy::{Waveform, sine, dc_bias};
+    /// use wavegen::{Waveform, sine, dc_bias};
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
@@ -54,7 +54,7 @@ impl<T: Clone> Waveform<T> {
     /// # Examples
     ///
     /// ```
-    /// use wavy::{Waveform, sine, dc_bias};
+    /// use wavegen::{Waveform, sine, dc_bias};
     ///
     /// let mut wf = Waveform::<f32>::new(100.0);
     /// wf.add_component(sine!(10));
@@ -71,7 +71,7 @@ impl<T: Clone> Waveform<T> {
     /// # Examples
     ///
     /// ```
-    /// use wavy::Waveform;
+    /// use wavegen::Waveform;
     ///
     /// let wf = Waveform::<f32>::new(42.0);
     ///
@@ -86,7 +86,7 @@ impl<T: Clone> Waveform<T> {
     /// # Examples
     ///
     /// ```
-    /// use wavy::{Waveform, sine, dc_bias};
+    /// use wavegen::{Waveform, sine, dc_bias};
     ///
     /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1), dc_bias!(5)]);
     ///

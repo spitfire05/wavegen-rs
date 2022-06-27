@@ -1,6 +1,6 @@
-# wavy
+# wavegen
 
-`wavy` is a wavefrom generator made with 🦀
+`wavegen` is a wavefrom generator made with 🦀
 
 Refer to [documentation](https://) for usage examples.
 

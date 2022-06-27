@@ -3,7 +3,7 @@
 //! # Quickstart
 //!
 //! ```
-//! use wavy::{Waveform, sine, dc_bias, sawtooth};
+//! use wavegen::{Waveform, sine, dc_bias, sawtooth};
 //!
 //! // Define a Waveform with 200Hz sampling rate and three function components,
 //! // choosing f32 as the ouput type:
@@ -22,7 +22,7 @@
 //! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
 //! 
 //! ```
-//! use wavy::Waveform;
+//! use wavegen::Waveform;
 //! 
 //! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(|x| x % 2 as f64)]);
 //! ```
@@ -34,7 +34,7 @@
 //! This lib will **not** enforce the Nyquist-Shannon rule on the waveforms you create, therefore abominations like this are possible (altough not recommended):
 //!
 //! ```
-//! use wavy::{Waveform, sine};
+//! use wavegen::{Waveform, sine};
 //!
 //! // 100 Hz sampling of 80 Hz sine... will not yield realistic results.
 //! let wf = Waveform::<f32>::with_components(100.0, vec![sine!(80)]);

@@ -23,14 +23,14 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 ///
 /// 50 Hz sine of amplitude 1 and no phase shift
 /// ```
-/// use wavy::sine;
+/// use wavegen::sine;
 ///
 /// let sine = sine!(50);
 /// ```
 ///
 /// 50 Hz sine of amplitude 20 and no phase shift
 /// ```
-/// use wavy::sine;
+/// use wavegen::sine;
 ///
 /// let sine = sine!(50, 20);
 /// ```
@@ -38,7 +38,7 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// 50 Hz sine of amplitude 20 and phase shift of half a turn
 /// ```
 /// use core::f64::consts::PI;
-/// use wavy::sine;
+/// use wavegen::sine;
 ///
 /// let sine = sine!(50, 20, 0.5);
 /// ```

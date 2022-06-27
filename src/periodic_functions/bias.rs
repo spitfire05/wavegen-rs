@@ -14,7 +14,7 @@ pub fn _dc_bias(bias: f64) -> PeriodicFunction {
 ///
 /// Defines bias of amplitude +10
 /// ```
-/// use wavy::dc_bias;
+/// use wavegen::dc_bias;
 ///
 /// let bias = dc_bias!(10);
 ///

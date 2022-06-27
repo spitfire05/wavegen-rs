@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use plotters::prelude::*;
-use wavy::{sawtooth, sine, Waveform};
+use wavegen::{sawtooth, sine, Waveform};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sample_rate = 150.0;
