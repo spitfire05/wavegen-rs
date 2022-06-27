@@ -17,6 +17,8 @@ pub fn dc_bias_builder(bias: f32) -> PeriodicFunction {
 /// use wavy::dc_bias;
 /// 
 /// let bias = dc_bias!(10);
+/// 
+/// assert!((0..100000).all(|x| bias(x as f32) == 10.0))
 /// ```
 #[macro_export]
 macro_rules! dc_bias {
