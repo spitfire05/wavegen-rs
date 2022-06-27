@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, path::Path};
+use std::path::Path;
 
 use plotters::prelude::*;
 use wavy::{sawtooth, sine, Waveform};
@@ -54,10 +54,11 @@ fn draw<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
     label: &str,
     iter: I,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let root = BitMapBackend::new(&path, (640, 480)).into_drawing_area();
+    let img_path = Path::new("img").join(path);
+    let root = BitMapBackend::new(&img_path, (320, 240)).into_drawing_area();
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
-        .caption(label, ("sans-serif", 50).into_font())
+        // .caption(label, ("sans-serif", 50).into_font())
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
@@ -67,7 +68,7 @@ fn draw<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
 
     chart
         .draw_series(LineSeries::new(iter, &RED))?
-        .label(label)
+        // .label(label)
         .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
 
     chart
