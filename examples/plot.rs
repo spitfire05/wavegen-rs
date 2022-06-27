@@ -1,7 +1,7 @@
 use std::{f32::consts::PI, path::Path};
 
 use plotters::prelude::*;
-use wavy::{Waveform, sine};
+use wavy::{sawtooth, sine, Waveform};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sample_rate = 150.0;
@@ -19,17 +19,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     draw(
         "sine_double.png",
         "Sines",
-        Waveform::<f32>::with_components(
-            sample_rate,
-            vec![
-                sine!(1.0),
-                sine!(1.0, 1.0, PI / 2.0),
-            ],
-        )
-        .into_iter()
-        .enumerate()
-        .map(|(i, x)| (i as f32 / sample_rate as f32, x))
-        .take(sample_rate as usize),
+        Waveform::<f32>::with_components(sample_rate, vec![sine!(1.0), sine!(1.0, 1.0, 0.25)])
+            .into_iter()
+            .enumerate()
+            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
+            .take(sample_rate as usize),
+    )?;
+
+    draw(
+        "sawtooth.png",
+        "Sawtooth",
+        Waveform::<f32>::with_components(sample_rate, vec![sawtooth!(2, 1, 0.0)])
+            .into_iter()
+            .enumerate()
+            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
+            .take(sample_rate as usize),
     )?;
 
     Ok(())

@@ -7,17 +7,17 @@ pub fn _dc_bias(bias: f64) -> PeriodicFunction {
 }
 
 /// Builder macro for DC Bias [PeriodicFunction].
-/// 
+///
 /// Takes just one argument - the bias value.
-/// 
+///
 /// # Examples
-/// 
+///
 /// Defines bias of amplitude +10
 /// ```
 /// use wavy::dc_bias;
-/// 
+///
 /// let bias = dc_bias!(10);
-/// 
+///
 /// assert!((0..100000).all(|x| bias(x as f64) == 10.0))
 /// ```
 #[macro_export]

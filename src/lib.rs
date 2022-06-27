@@ -1,6 +1,7 @@
 //! 'wavy' is a pure rust waveform generator.
 
 #![no_std]
+#![deny(missing_docs)]
 
 extern crate alloc;
 

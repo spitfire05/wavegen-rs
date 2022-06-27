@@ -1,2 +1,3 @@
-pub mod sine;
 pub mod bias;
+pub mod sawtooth;
+pub mod sine;

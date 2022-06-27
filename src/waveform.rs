@@ -13,16 +13,15 @@ pub struct Waveform<T: Clone> {
 }
 
 impl<T: Clone> Waveform<T> {
-    
     /// Initializes new empty [Waveform]
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use wavy::Waveform;
-    /// 
+    ///
     /// let wf = Waveform::<f32>::new(500.0);
-    /// 
+    ///
     /// assert!(wf.into_iter().take(100).all(|y| y == 0.0));
     /// ```
     pub fn new(sample_rate: f64) -> Self {
@@ -34,12 +33,12 @@ impl<T: Clone> Waveform<T> {
     }
 
     /// Initializes new [Waveform] with predefined components
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use wavy::{Waveform, sine, dc_bias};
-    /// 
+    ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
     pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
@@ -51,16 +50,16 @@ impl<T: Clone> Waveform<T> {
     }
 
     /// Ads a new component to existing [Waveform].
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use wavy::{Waveform, sine, dc_bias};
-    /// 
+    ///
     /// let mut wf = Waveform::<f32>::new(100.0);
     /// wf.add_component(sine!(10));
     /// wf.add_component(dc_bias!(5));
-    /// 
+    ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
     pub fn add_component(&mut self, component: PeriodicFunction) {
@@ -68,14 +67,14 @@ impl<T: Clone> Waveform<T> {
     }
 
     /// Getter for sample rate of a [Waveform].
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use wavy::Waveform;
-    /// 
+    ///
     /// let wf = Waveform::<f32>::new(42.0);
-    /// 
+    ///
     /// assert_eq!(42.0, wf.get_sample_rate());
     /// ```
     pub fn get_sample_rate(&self) -> f64 {
@@ -83,14 +82,14 @@ impl<T: Clone> Waveform<T> {
     }
 
     /// Returns number of components this [Waveform] consists of.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use wavy::{Waveform, sine, dc_bias};
-    /// 
+    ///
     /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1), dc_bias!(5)]);
-    /// 
+    ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
     pub fn get_components_len(&self) -> usize {
@@ -132,7 +131,7 @@ mod tests {
     use alloc::{vec, vec::Vec};
 
     use super::Waveform;
-    use crate::{sine, dc_bias};
+    use crate::{dc_bias, sine};
 
     // TODO: needs more tests
 

@@ -6,26 +6,32 @@ use libm::sin;
 use crate::PeriodicFunction;
 
 pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
-    Box::new(move |t| sin((2.0 * PI * frequency * t) + phase) * amplitude)
+    Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
 }
 
 /// Builder macro for Sine [PeriodicFunction].
-/// 
+///
 /// Takes up to 3 arguments - frequency {amplitude, {phase}}
-/// 
+///
+/// | argument | unit | notes |
+/// | -------- | ---- | ----- |
+/// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
+/// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
+/// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
+///
 /// # Examples
-/// 
+///
 /// 50 Hz sine of amplitude 1 and no phase shift
 /// ```
 /// use wavy::sine;
-/// 
+///
 /// let sine = sine!(50);
 /// ```
-/// 
+///
 /// 50 Hz sine of amplitude 20 and no phase shift
 /// ```
 /// use wavy::sine;
-/// 
+///
 /// let sine = sine!(50, 20);
 /// ```
 ///
@@ -33,7 +39,7 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// ```
 /// use core::f64::consts::PI;
 /// use wavy::sine;
-/// 
+///
 /// let sine = sine!(50, 20, PI);
 /// ```
 #[macro_export]
@@ -51,8 +57,6 @@ macro_rules! sine {
 
 #[cfg(test)]
 mod tests {
-    use core::f64::consts::PI;
-
     use float_cmp::approx_eq;
 
     const EPS: f64 = 1e-3;
@@ -65,21 +69,21 @@ mod tests {
         let min = sine(0.75);
         let zero = sine(0.5);
 
-        assert!(approx_eq!(f64, max, 1.0, epsilon=EPS));
-        assert!(approx_eq!(f64, min, -1.0, epsilon=EPS));
-        assert!(approx_eq!(f64, zero, 0.0, epsilon=EPS));
+        assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, zero, 0.0, epsilon = EPS));
     }
 
     #[test]
     fn phase_affects_min_max_amplitude_position() {
-        let sine = sine!(1, 1, PI);
+        let sine = sine!(1, 1, 0.5);
 
         let max = sine(0.75);
         let min = sine(0.25);
         let zero = sine(0.5);
 
-        assert!(approx_eq!(f64, max, 1.0, epsilon=EPS));
-        assert!(approx_eq!(f64, min, -1.0, epsilon=EPS));
-        assert!(approx_eq!(f64, zero, 0.0, epsilon=EPS));
+        assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, zero, 0.0, epsilon = EPS));
     }
 }
