@@ -140,7 +140,7 @@ mod tests {
     fn sine_waveform_has_default_amplitude_of_one() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1)]);
 
-        let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
+        let samples = wf.into_iter().take(100).collect::<Vec<_>>();
 
         assert_eq!(samples[25], 1.0);
         assert_eq!(samples[75], -1.0);
@@ -150,7 +150,7 @@ mod tests {
     fn sine_waveform_as_integers_has_amplitude_of_one() {
         let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1)]);
 
-        let samples = wf.into_iter().take(100).collect::<Vec<i32>>();
+        let samples = wf.into_iter().take(100).collect::<Vec<_>>();
 
         assert_eq!(samples[25], 1);
         assert_eq!(samples[75], -1);
@@ -160,7 +160,7 @@ mod tests {
     fn sine_waveform_with_bias_has_correct_amplitude() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5)]);
 
-        let samples = wf.into_iter().take(100).collect::<Vec<f32>>();
+        let samples = wf.into_iter().take(100).collect::<Vec<_>>();
 
         assert_eq!(samples[25], 6.0);
         assert_eq!(samples[75], 4.0);
