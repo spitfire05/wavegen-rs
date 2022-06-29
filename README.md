@@ -36,4 +36,8 @@ let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
 
 ![Sine and sawtooth superposed](img/sawtooth_sinesised.png)
 
+* Square wave
+
+![Square wave](img/square.png)
+
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
