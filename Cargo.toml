@@ -6,7 +6,7 @@ authors = ["Michal Borejszo <michael.borejszo@gmail.com>"]
 description = "Wavefrom generator library"
 repository = "https://github.com/spitfire05/wavegen-rs"
 readme = "README.md"
-keywords = ["waveform", "function", "generator", "sine", "square", "wave"]
+keywords = ["waveform", "function", "generator", "sine"]
 categories = ["mathematics", "no-standard-library"]
 
 [dependencies]
