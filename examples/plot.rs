@@ -52,7 +52,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "square.png",
         "Square",
-        Waveform::<f32>::with_components(sample_rate, vec![square!(2, 1, 0)])
+        Waveform::<f32>::with_components(sample_rate, vec![square!(2)])
+    )?;
+    
+    draw!(
+        sample_rate,
+        "funky.png",
+        "Something funky",
+        Waveform::<f32>::with_components(sample_rate, vec![sine!(10, 0.3), sawtooth!(2, 0.3), square!(3, 0.3)])
     )?;
 
     Ok(())

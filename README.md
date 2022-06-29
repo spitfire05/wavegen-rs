@@ -40,4 +40,8 @@ let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
 
 ![Square wave](img/square.png)
 
+* Superposition of Sine, Square and Sawtooth with different frequencies
+
+![Something funky](img/funky.png)
+
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
