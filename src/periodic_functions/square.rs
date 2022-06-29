@@ -1,5 +1,5 @@
 use alloc::boxed::Box;
-use libm::{pow, floor};
+use libm::{floor, pow};
 
 use crate::PeriodicFunction;
 
@@ -54,11 +54,11 @@ mod tests {
         let square = square!(1);
 
         for x in [0.0, 0.1, 0.2, 0.3, 0.4] {
-            assert!(approx_eq!(f64, square(x), 1.0, epsilon=EPS))
+            assert!(approx_eq!(f64, square(x), 1.0, epsilon = EPS))
         }
 
         for x in [0.5, 0.6, 0.7, 0.8, 0.9] {
-            assert!(approx_eq!(f64, square(x), -1.0, epsilon=EPS))
+            assert!(approx_eq!(f64, square(x), -1.0, epsilon = EPS))
         }
     }
 }

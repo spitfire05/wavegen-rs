@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use plotters::prelude::*;
-use wavegen::{sawtooth, sine, Waveform, square};
+use wavegen::{sawtooth, sine, square, Waveform};
 
 macro_rules! draw {
     ($sample_rate:expr, $path:expr, $label:expr, $waveform:expr) => {
@@ -9,10 +9,10 @@ macro_rules! draw {
             $path,
             $label,
             $waveform
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| (i as f32 / $sample_rate as f32, x))
-            .take($sample_rate as usize)
+                .into_iter()
+                .enumerate()
+                .map(|(i, x)| (i as f32 / $sample_rate as f32, x))
+                .take($sample_rate as usize),
         )
     };
 }
@@ -45,7 +45,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "sawtooth_sinesised.png",
         "Sawtooth with sine",
-        Waveform::<f32>::with_components(sample_rate, vec![sawtooth!(2, 1, 0.0), sine!(frequency = 50, amplitude = 0.1)])
+        Waveform::<f32>::with_components(
+            sample_rate,
+            vec![sawtooth!(2, 1, 0.0), sine!(frequency = 50, amplitude = 0.1)]
+        )
     )?;
 
     draw!(
@@ -54,12 +57,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Square",
         Waveform::<f32>::with_components(sample_rate, vec![square!(2)])
     )?;
-    
+
     draw!(
         sample_rate,
         "funky.png",
         "Something funky",
-        Waveform::<f32>::with_components(sample_rate, vec![sine!(10, 0.3), sawtooth!(2, 0.3), square!(3, 0.3)])
+        Waveform::<f32>::with_components(
+            sample_rate,
+            vec![sine!(10, 0.3), sawtooth!(2, 0.3), square!(3, 0.3)]
+        )
     )?;
 
     Ok(())

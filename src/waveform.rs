@@ -132,7 +132,7 @@ mod tests {
     use float_cmp::approx_eq;
 
     use super::Waveform;
-    use crate::{dc_bias, sine, sawtooth};
+    use crate::{dc_bias, sawtooth, sine};
 
     const EPS: f32 = 1e-3;
 
@@ -172,7 +172,7 @@ mod tests {
 
         let bias = wf.into_iter().take(100).sum::<f32>() / 100.0;
 
-        assert!(approx_eq!(f32, bias, 0.0, epsilon=EPS));
+        assert!(approx_eq!(f32, bias, 0.0, epsilon = EPS));
     }
 
     #[test]
@@ -181,6 +181,6 @@ mod tests {
 
         let bias = wf.into_iter().take(100).sum::<f32>() / 100.0;
 
-        assert!(approx_eq!(f32, bias, 0.0, epsilon=1e-2));
+        assert!(approx_eq!(f32, bias, 0.0, epsilon = 1e-2));
     }
 }
