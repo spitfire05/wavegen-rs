@@ -4,15 +4,15 @@
 
 Refer to [documentation](https://) for usage examples.
 
-## What can it do?
+## How to use it?
 
-1) Define a waveform iterator
+1) Define a waveform with sampling frequency and function components
 
 ```rust
 let wf = Waveform::<f64>::with_components(200.0, vec![sine!(100, 10), dc_bias!(20)]);
 ```
 
-2. Use it
+2. Turn it into an iterator and sample
 
 ```rust
 let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
