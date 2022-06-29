@@ -9,7 +9,7 @@ Refer to [documentation](https://) for usage examples.
 1) Define a waveform iterator
 
 ```rust
-let wf = Waveform::<f64>::with_components(200.0, sine!(100, 10), dc_bias!(20));
+let wf = Waveform::<f64>::with_components(200.0, vec![sine!(100, 10), dc_bias!(20)]);
 ```
 
 2. Use it
