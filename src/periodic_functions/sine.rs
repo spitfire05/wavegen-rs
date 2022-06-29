@@ -1,50 +1,98 @@
-use core::f32::consts::PI;
+use core::f64::consts::PI;
 
-use libm::sinf;
+use alloc::boxed::Box;
+use libm::sin;
 
-use super::PeriodicFunction;
+use crate::PeriodicFunction;
 
-pub struct Sine {
-    frequency: f32,
-    amplitude: f32,
-    phase: f32,
-    dc_bias: f32,
+pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
 }
 
-impl Sine {
-    pub fn with_frequency(frequency: f32) -> Self {
-        Sine {
-            frequency,
-            amplitude: 1.0,
-            phase: 0.0,
-            dc_bias: 0.0
-        }
-    }
-}
-
-impl PeriodicFunction for Sine {
-    fn sample(&self, t: f32) -> f32 {
-        (sinf(2.0 * PI * self.frequency * t + self.phase) * self.amplitude) + self.dc_bias
-    }
+/// Builder macro for Sine [PeriodicFunction].
+///
+/// Takes up to 3 arguments - frequency {amplitude, {phase}}
+///
+/// | argument | unit | notes |
+/// | -------- | ---- | ----- |
+/// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
+/// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
+/// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
+///
+/// # Examples
+///
+/// 50 Hz sine of amplitude 1 and no phase shift
+/// ```
+/// use wavegen::sine;
+///
+/// let sine = sine!(50);
+/// ```
+///
+/// 50 Hz sine of amplitude 20 and no phase shift
+/// ```
+/// use wavegen::sine;
+///
+/// let sine = sine!(frequency = 50, amplitude = 20);
+/// ```
+///
+/// 50 Hz sine of amplitude 20 and phase shift of half a turn
+/// ```
+/// use core::f64::consts::PI;
+/// use wavegen::sine;
+///
+/// let sine = sine!(50, 20, 0.5);
+/// ```
+#[macro_export]
+macro_rules! sine {
+    (frequency = $frequency:expr) => {
+        sine!($frequency)
+    };
+    (frequency = $frequency:expr, amplitude = $amplitude:expr) => {
+        sine!($frequency, $amplitude)
+    };
+    (frequency = $frequency:expr, amplitude = $amplitude:expr, phase = $phase:expr) => {
+        sine!($frequency, $amplitude, $phase)
+    };
+    ($frequency:expr) => {
+        sine!($frequency, 1.0, 0.0)
+    };
+    ($frequency:expr, $amplitude:expr) => {
+        sine!($frequency, $amplitude, 0.0)
+    };
+    ($frequency:expr, $amplitude:expr, $phase:expr) => {
+        $crate::periodic_functions::sine::_sine($frequency as f64, $amplitude as f64, $phase as f64)
+    };
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Sine, PeriodicFunction};
+    use float_cmp::approx_eq;
+
+    const EPS: f64 = 1e-3;
 
     #[test]
-    fn create_sine() {
-        let _sine = Sine::with_frequency(0.0);
+    fn default_sine_has_amplitude_of_one_and_no_phase_shift() {
+        let sine = sine!(1);
+
+        let max = sine(0.25);
+        let min = sine(0.75);
+        let zero = sine(0.5);
+
+        assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, zero, 0.0, epsilon = EPS));
     }
 
     #[test]
-    fn default_sine_has_amplitude_of_one() {
-        let sine = Sine::with_frequency(1.0);
-        
-        let sample = sine.sample(0.25);
-        assert_eq!(sample, 1.0);
+    fn phase_affects_min_max_amplitude_position() {
+        let sine = sine!(1, 1, 0.5);
 
-        let sample = sine.sample(0.75);
-        assert_eq!(sample, -1.0);
+        let max = sine(0.75);
+        let min = sine(0.25);
+        let zero = sine(0.5);
+
+        assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, zero, 0.0, epsilon = EPS));
     }
 }

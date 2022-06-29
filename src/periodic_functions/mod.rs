@@ -1,5 +1,4 @@
+pub mod bias;
+pub mod sawtooth;
 pub mod sine;
-
-pub trait PeriodicFunction {
-    fn sample(&self, t: f32) -> f32;
-}
+pub mod square;
