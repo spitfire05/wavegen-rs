@@ -26,7 +26,16 @@ macro_rules! sawtooth {
     ($frequency:expr) => {
         sawtooth!($frequency, 1.0, 0.0)
     };
+    (frequency = $frequency:expr) => {
+        sawtooth!($frequency)
+    };
     ($frequency:expr, $amplitude:expr) => {
+        sawtooth!($frequency, $amplitude, 0.0)
+    };
+    (frequency = $frequency:expr, amplitude = $amplitude:expr) => {
+        sawtooth!($frequency, $amplitude)
+    };
+    (frequency = $frequency:expr, amplitude = $amplitude:expr, phase = $phase:expr) => {
         sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {

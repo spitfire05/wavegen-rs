@@ -18,6 +18,21 @@
 //!
 //! Look into macros section for a complete list of defined periodic functions and their constructors.
 //! 
+//! # Periodic function macros
+//! The macros for building predefined [PeriodicFunction]s generally have a form of:
+//! ```no_run
+//! function!(frequency, amplitude, phase)
+//! ```
+//! 
+//! They come in an annotated and non-annotated form, so for exmaple a Sine function can be expressed in both ways:
+//! ```no_run
+//! let sine = sine!(100, 20, 0.25);
+//! 
+//! let sine = sine!(frequency = 100, amplitude = 20, phase = 0.25)
+//! ```
+//! 
+//! Refer to Macros section for more info.
+//! 
 //! # Custom periodic functions
 //! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
 //! 

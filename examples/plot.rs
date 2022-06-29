@@ -3,63 +3,62 @@ use std::path::Path;
 use plotters::prelude::*;
 use wavegen::{sawtooth, sine, Waveform, square};
 
+macro_rules! draw {
+    ($sample_rate:expr, $path:expr, $label:expr, $waveform:expr) => {
+        draw_internal(
+            $path,
+            $label,
+            $waveform
+            .into_iter()
+            .enumerate()
+            .map(|(i, x)| (i as f32 / $sample_rate as f32, x))
+            .take($sample_rate as usize)
+        )
+    };
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sample_rate = 150.0;
 
-    draw(
+    draw!(
+        sample_rate,
         "sine.png",
         "Sine",
-        Waveform::<f32>::with_components(sample_rate, vec![sine!(1.0)])
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
-            .take(sample_rate as usize),
+        Waveform::<f32>::with_components(sample_rate, vec![sine![1.0]])
     )?;
 
-    draw(
+    draw!(
+        sample_rate,
         "sine_double.png",
         "Sines",
         Waveform::<f32>::with_components(sample_rate, vec![sine!(1.0), sine!(1.0, 1.0, 0.25)])
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
-            .take(sample_rate as usize),
     )?;
 
-    draw(
+    draw!(
+        sample_rate,
         "sawtooth.png",
         "Sawtooth",
         Waveform::<f32>::with_components(sample_rate, vec![sawtooth!(2, 1, 0.0)])
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
-            .take(sample_rate as usize),
     )?;
 
-    draw(
+    draw!(
+        sample_rate,
         "sawtooth_sinesised.png",
         "Sawtooth with sine",
-        Waveform::<f32>::with_components(sample_rate, vec![sawtooth!(2, 1, 0.0), sine!(50, 0.1)])
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
-            .take(sample_rate as usize),
+        Waveform::<f32>::with_components(sample_rate, vec![sawtooth!(2, 1, 0.0), sine!(frequency = 50, amplitude = 0.1)])
     )?;
 
-    draw(
+    draw!(
+        sample_rate,
         "square.png",
         "Square",
-        Waveform::<f32>::with_components(sample_rate, vec![square!(2, 1, 0, 0.5)])
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
-            .take(sample_rate as usize),
+        Waveform::<f32>::with_components(sample_rate, vec![square!(2, 1, 0)])
     )?;
 
     Ok(())
 }
 
-fn draw<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
+fn draw_internal<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
     path: P,
     label: &str,
     iter: I,
