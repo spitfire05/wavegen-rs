@@ -45,3 +45,7 @@ let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
 ![Something funky](img/funky.png)
 
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
+
+## `no_std`?
+
+Yes. This crate requires no standard library features, and uses the `no_std` declaration.
