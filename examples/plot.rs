@@ -18,7 +18,7 @@ macro_rules! draw {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let sample_rate = 150.0;
+    let sample_rate = 400.0;
 
     draw!(
         sample_rate,
