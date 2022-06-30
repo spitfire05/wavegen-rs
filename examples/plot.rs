@@ -74,7 +74,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Sine 300Hz + 50 Hz",
         Waveform::<f32>::with_components(
             sample_rate,
-            vec![sine!(frequency = 300), sine!(frequency = 50, amplitude = 0.3)]
+            vec![
+                sine!(frequency = 300),
+                sine!(frequency = 50, amplitude = 0.3)
+            ]
         )
     )?;
 
