@@ -18,7 +18,7 @@ macro_rules! draw {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let sample_rate = 400.0;
+    let sample_rate = 800.0;
 
     draw!(
         sample_rate,
@@ -68,6 +68,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
     )?;
 
+    draw!(
+        sample_rate,
+        "sines_300_50_hz.png",
+        "Sine 300Hz + 50 Hz",
+        Waveform::<f32>::with_components(
+            sample_rate,
+            vec![
+                sine!(frequency = 300),
+                sine!(frequency = 50, amplitude = 0.3)
+            ]
+        )
+    )?;
+
     Ok(())
 }
 
@@ -77,7 +90,7 @@ fn draw_internal<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
     iter: I,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let img_path = Path::new("img").join(path);
-    let root = BitMapBackend::new(&img_path, (640, 480)).into_drawing_area();
+    let root = BitMapBackend::new(&img_path, (800, 600)).into_drawing_area();
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
         // .caption(label, ("sans-serif", 50).into_font())

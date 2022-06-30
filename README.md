@@ -31,6 +31,10 @@ let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
 
 ![Superposed sines plot](img/sine_double.png)
 
+* "Real life" example: 300Hz sine signal with 50Hz interference noise
+
+![300_50_hz_sines](img/sines_300_50_hz.png)
+
 * Sawtooth
 
 ![Sawtooth plot](img/sawtooth.png)
