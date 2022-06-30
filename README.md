@@ -56,3 +56,6 @@ All above examples are generated with simple program found in `examples/plot.rs`
 ## `no_std`?
 
 Yes. This crate requires no standard library features, and uses the `no_std` declaration.
+
+## Similar crates
+* [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
