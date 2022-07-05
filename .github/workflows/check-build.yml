@@ -6,6 +6,7 @@ on:
     paths:
       - "src/**"
       - "examples/**"
+      - "benches/**"
       - "Cargo.toml"
 
 env:
