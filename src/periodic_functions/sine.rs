@@ -1,10 +1,14 @@
 use core::f64::consts::PI;
 
+#[cfg(feature = "nostd")]
 use alloc::boxed::Box;
+
+#[cfg(feature = "libm")]
 use libm::sin;
 
 use crate::PeriodicFunction;
 
+#[cfg(not(feature = "nostd"))]
 pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     Box::new(
         move |t| {
@@ -14,8 +18,11 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
             sine * amplitude
         }
     )
+}
 
-    // Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
+#[cfg(feature = "nostd")]
+pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
 }
 
 /// Builder macro for Sine [PeriodicFunction].
