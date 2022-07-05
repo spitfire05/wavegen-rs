@@ -5,7 +5,16 @@ use crate::PeriodicFunction;
 
 pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
-    Box::new(move |t| amplitude * pow(-1.0, floor((2.0 * (t - phase)) / (1.0 / frequency))))
+    Box::new(
+        move |t| {
+            let power = (2.0 * (t - phase) * frequency).floor() as i32;
+            
+            amplitude * (-1f64).powi(power)
+        }
+    )
+
+
+    // Box::new(move |t| amplitude * pow(-1.0, floor((2.0 * (t - phase)) / (1.0 / frequency))))
 }
 
 /// Builder macro for Square [PeriodicFunction].

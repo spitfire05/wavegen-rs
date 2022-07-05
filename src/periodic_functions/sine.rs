@@ -6,7 +6,16 @@ use libm::sin;
 use crate::PeriodicFunction;
 
 pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
-    Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
+    Box::new(
+        move |t| {
+            let radians = (2.0 * PI * frequency * t) + (phase * 2.0 * PI);
+            let sine = radians.sin();
+
+            sine * amplitude
+        }
+    )
+
+    // Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
 }
 
 /// Builder macro for Sine [PeriodicFunction].
