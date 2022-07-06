@@ -1,11 +1,11 @@
 # wavegen
 
 [![Crates.io](https://img.shields.io/crates/v/wavegen)](https://crates.io/crates/wavegen)
-[![docs](https://img.shields.io/docsrs/wavegen)](https://docs.rs/wavegen/0.1.0/wavegen/)
+[![docs](https://img.shields.io/docsrs/wavegen)](https://docs.rs/wavegen)
 
 `wavegen` is a wavefrom generator made with 🦀
 
-Refer to [documentation](https://docs.rs/wavegen/0.1.0/wavegen/) for more exhaustive usage examples.
+Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.
 
 ## How to use it?
 
