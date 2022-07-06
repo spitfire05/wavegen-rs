@@ -13,7 +13,7 @@ pub struct Waveform<T: Clone> {
     _phantom: PhantomData<T>,
 }
 
-impl<T: Clone> Waveform<T> {
+impl<'a, T: Clone> Waveform<T> {
     /// Initializes new empty [Waveform]
     ///
     /// # Examples
@@ -23,7 +23,7 @@ impl<T: Clone> Waveform<T> {
     ///
     /// let wf = Waveform::<f32>::new(500.0);
     ///
-    /// assert!(wf.into_iter().take(100).all(|y| y == 0.0));
+    /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
     pub fn new(sample_rate: f64) -> Self {
         Waveform {
@@ -96,6 +96,23 @@ impl<T: Clone> Waveform<T> {
     pub fn get_components_len(&self) -> usize {
         self.components.len()
     }
+
+    /// Returns an iterator over this [Waveform] samples.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use wavegen::{Waveform, sine, dc_bias};
+    ///
+    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1)]);
+    /// let samples = wf.iter().take(100).collect::<Vec<_>>();
+    /// ```
+    pub fn iter(&self) -> WaveformIterator<T> {
+        WaveformIterator::<T> {
+            inner: self,
+            time: 0.0,
+        }
+    }
 }
 
 impl<'a, T: Clone + NumCast> IntoIterator for &'a Waveform<T> {
@@ -121,9 +138,14 @@ impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // TODO: normalize?
         let sample: f64 = self.inner.components.iter().map(|x| x(self.time)).sum();
-        self.time += 1.0 / self.inner.sample_rate;
+        let new_time = self.time + 1.0 / self.inner.sample_rate;
+        if new_time.is_finite() {
+            self.time = new_time;
+        } else {
+            self.time = (1.0 / self.inner.sample_rate) - (f64::MAX - self.time);
+        }
+
         NumCast::from(sample)
     }
 }
@@ -143,7 +165,7 @@ mod tests {
     fn sine_waveform_has_default_amplitude_of_one() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1)]);
 
-        let samples = wf.into_iter().take(100).collect::<Vec<_>>();
+        let samples = wf.iter().take(100).collect::<Vec<_>>();
 
         assert_eq!(samples[25], 1.0);
         assert_eq!(samples[75], -1.0);
@@ -153,7 +175,7 @@ mod tests {
     fn sine_waveform_as_integers_has_amplitude_of_one() {
         let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1)]);
 
-        let samples = wf.into_iter().take(100).collect::<Vec<_>>();
+        let samples = wf.iter().take(100).collect::<Vec<_>>();
 
         assert_eq!(samples[25], 1);
         assert_eq!(samples[75], -1);
@@ -163,7 +185,7 @@ mod tests {
     fn sine_waveform_with_bias_has_correct_amplitude() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5)]);
 
-        let samples = wf.into_iter().take(100).collect::<Vec<_>>();
+        let samples = wf.iter().take(100).collect::<Vec<_>>();
 
         assert_eq!(samples[25], 6.0);
         assert_eq!(samples[75], 4.0);
@@ -173,7 +195,7 @@ mod tests {
     fn default_sine_wavefrom_has_no_bias() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(10)]);
 
-        let bias = wf.into_iter().take(100).sum::<f32>() / 100.0;
+        let bias = wf.iter().take(100).sum::<f32>() / 100.0;
 
         assert!(approx_eq!(f32, bias, 0.0, epsilon = EPS));
     }
@@ -182,8 +204,18 @@ mod tests {
     fn default_sawtooth_wavefrom_has_no_bias() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sawtooth!(1)]);
 
-        let bias = wf.into_iter().take(100).sum::<f32>() / 100.0;
+        let bias = wf.iter().take(100).sum::<f32>() / 100.0;
 
         assert!(approx_eq!(f32, bias, 0.0, epsilon = 1e-2));
+    }
+
+    #[test]
+    fn waveform_iterator_is_infinite() {
+        let wf = Waveform::<f64>::new(f64::MIN_POSITIVE);
+        let mut iter = wf.iter();
+        let samples = iter.take(1e5 as usize).collect::<Vec<_>>();
+
+        assert_eq!(1e5 as usize, samples.len());
+        assert_eq!(Some(0f64), iter.next());
     }
 }

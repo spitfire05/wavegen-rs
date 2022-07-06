@@ -7,7 +7,7 @@ fn sample_waveform(n: usize) -> Vec<f64> {
         vec![sine!(2048), sawtooth!(1024), square!(512), dc_bias!(0.1)],
     );
 
-    wf.into_iter().take(n).collect::<Vec<f64>>()
+    wf.iter().take(n).collect::<Vec<f64>>()
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
