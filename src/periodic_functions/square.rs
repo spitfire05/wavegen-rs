@@ -8,13 +8,11 @@ use crate::PeriodicFunction;
 #[cfg(all(not(feature = "libm"), feature = "std"))]
 pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
-    Box::new(
-        move |t| {
-            let power = (2.0 * (t - phase) * frequency).floor() as i32;
-            
-            amplitude * (-1f64).powi(power)
-        }
-    )
+    Box::new(move |t| {
+        let power = (2.0 * (t - phase) * frequency).floor() as i32;
+
+        amplitude * (-1f64).powi(power)
+    })
 }
 
 #[cfg(feature = "libm")]
