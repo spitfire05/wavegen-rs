@@ -35,7 +35,7 @@ jobs:
     - name: Build
       run: cargo build --verbose ${{ matrix.build_args }}
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose ${{ matrix.build_args }}
       
   lint:
     runs-on: ubuntu-latest
