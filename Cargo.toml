@@ -27,5 +27,5 @@ std = []
 bench = false
 
 [[bench]]
-name = "my_benchmark"
+name = "waveform_benchmark"
 harness = false
