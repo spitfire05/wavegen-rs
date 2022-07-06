@@ -111,6 +111,7 @@ impl<'a, T: Clone + NumCast> IntoIterator for &'a Waveform<T> {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct WaveformIterator<'a, T: Clone> {
     inner: &'a Waveform<T>,
     time: f64,
