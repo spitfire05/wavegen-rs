@@ -6,6 +6,7 @@ on:
     paths:
       - "src/**"
       - "examples/**"
+      - "benches/**"
       - "Cargo.toml"
   
   workflow_dispatch:
@@ -15,6 +16,9 @@ env:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        build_args: ["", "--no-default-features --features libm", "--features libm"]
 
     runs-on: ubuntu-latest
     
@@ -29,9 +33,9 @@ jobs:
         toolchain: stable
         override: true
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose ${{ matrix.build_args }}
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose ${{ matrix.build_args }}
       
   lint:
     runs-on: ubuntu-latest
