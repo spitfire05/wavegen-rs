@@ -62,7 +62,7 @@
 //!
 //! As it is often a case, it is you, the programmer, who's left in charge of making sure the input data makes sense.
 
-#![cfg_attr(feature="nostd", no_std)]
+#![cfg_attr(not(feature="std"), no_std)]
 #![deny(missing_docs)]
 
 extern crate alloc;

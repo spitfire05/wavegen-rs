@@ -20,7 +20,8 @@ float-cmp = "0.9.0"
 criterion = "0.3"
 
 [features]
-nostd = ["libm"]
+default = ["std"]
+std = []
 
 [lib]
 bench = false

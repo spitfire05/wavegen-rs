@@ -1,4 +1,4 @@
-#[cfg(feature = "nostd")]
+#[cfg(not(feature = "std"))]
 use alloc::boxed::Box;
 
 #[cfg(feature = "libm")]
@@ -6,7 +6,7 @@ use libm::{floor, pow};
 
 use crate::PeriodicFunction;
 
-#[cfg(not(feature = "nostd"))]
+#[cfg(not(feature = "libm"))]
 pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
     Box::new(
@@ -18,7 +18,7 @@ pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     )
 }
 
-#[cfg(feature = "nostd")]
+#[cfg(feature = "libm")]
 pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
     Box::new(move |t| amplitude * pow(-1.0, floor((2.0 * (t - phase)) / (1.0 / frequency))))
