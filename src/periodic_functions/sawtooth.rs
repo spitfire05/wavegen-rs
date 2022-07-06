@@ -4,7 +4,10 @@ use crate::PeriodicFunction;
 
 #[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {
+    // this is **slower** than ` x - ((x as i64) as f64)` on x86_64-pc-windows-msvc target,
+    // but faster that the "casting hack" when `target-cpu=native`
     x.fract()
+    // x - ((x as i64) as f64)
 }
 
 #[cfg(all(not(feature = "std"), feature = "libm"))]
@@ -16,7 +19,7 @@ fn frac(x: f64) -> f64 {
 }
 
 pub fn _sawtooth(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
-    Box::new(move |t| 2.0 * amplitude * frac(t / (1.0 / frequency) + phase) - amplitude)
+    Box::new(move |t| 2.0 * amplitude * frac(t * frequency + phase) - amplitude)
 }
 
 /// Builder macro for Sine [PeriodicFunction].
@@ -67,6 +70,7 @@ mod tests {
         assert!(approx_eq!(f64, frac(1.5), 0.5, epsilon = EPS));
         assert!(approx_eq!(f64, frac(21.37), 0.37, epsilon = EPS));
         assert!(approx_eq!(f64, frac(42.69), 0.69, epsilon = EPS));
+        assert!(approx_eq!(f64, frac(-5.55), -0.55, epsilon = EPS));
     }
 
     #[test]
