@@ -2,10 +2,17 @@ use alloc::boxed::Box;
 
 use crate::PeriodicFunction;
 
+#[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {
-    let i = x as i64;
+    x.fract()
+}
 
-    x - i as f64
+#[cfg(all(not(feature = "std"), feature = "libm"))]
+fn frac(x: f64) -> f64 {
+    use libm::modf;
+    let (frac, _) = modf(x);
+
+    frac
 }
 
 pub fn _sawtooth(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
