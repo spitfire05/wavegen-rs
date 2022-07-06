@@ -59,7 +59,7 @@ All above examples are generated with simple program found in `examples/plot.rs`
 
 ```toml
 [dependencies]
-wavegen = {version = "0.2", default-features = false, features = ["libm"] }
+wavegen = { version = "0.2", default-features = false, features = ["libm"] }
 ```
 
 ## Similar crates
