@@ -55,7 +55,7 @@ All above examples are generated with simple program found in `examples/plot.rs`
 
 ## `no_std`
 
-`no_std` support can be enabled by disabling the default `std` feature and enabling the `libm` backend, required for trygonometry functions:
+`no_std` support can be enabled by disabling the default `std` feature and enabling the `libm` backend, required for math functions:
 
 ```toml
 [dependencies]
