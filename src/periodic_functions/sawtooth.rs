@@ -4,10 +4,9 @@ use crate::PeriodicFunction;
 
 #[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {
-    // this is **slower** than ` x - ((x as i64) as f64)` on x86_64-pc-windows-msvc target,
-    // but faster that the "casting hack" when `target-cpu=native`
+    // this is actually slower than `x - ((x as i64) as f64)` on x86_64-pc-windows-msvc target,
+    // but faster than the "casting hack" when `target-cpu=native` (tested on skylake)
     x.fract()
-    // x - ((x as i64) as f64)
 }
 
 #[cfg(all(not(feature = "std"), feature = "libm"))]
