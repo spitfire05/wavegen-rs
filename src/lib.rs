@@ -62,8 +62,14 @@
 //!
 //! As it is often a case, it is you, the programmer, who's left in charge of making sure the input data makes sense.
 
-#![cfg_attr(not(feature="std"), no_std)]
+#![no_std]
 #![deny(missing_docs)]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+#[cfg(all(not(feature = "libm"), not(feature = "std")))]
+compile_error!("at least one of \"libm\", \"std\" features has to be enabled");
 
 extern crate alloc;
 

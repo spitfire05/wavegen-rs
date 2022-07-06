@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 
 use alloc::{vec, vec::Vec};
+
 use num_traits::NumCast;
 
 use crate::PeriodicFunction;
@@ -129,6 +130,7 @@ impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
 #[cfg(test)]
 mod tests {
     use alloc::{vec, vec::Vec};
+
     use float_cmp::approx_eq;
 
     use super::Waveform;
