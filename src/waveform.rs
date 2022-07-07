@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use alloc::{vec, vec::Vec};
 
-use num_traits::NumCast;
+use num_traits::{NumCast, Bounded};
 
 use crate::PeriodicFunction;
 
@@ -13,7 +13,7 @@ pub struct Waveform<T: Clone> {
     _phantom: PhantomData<T>,
 }
 
-impl<'a, T: Clone> Waveform<T> {
+impl< T: Clone> Waveform<T> {
     /// Initializes new empty [Waveform]
     ///
     /// # Examples
@@ -115,7 +115,7 @@ impl<'a, T: Clone> Waveform<T> {
     }
 }
 
-impl<'a, T: Clone + NumCast> IntoIterator for &'a Waveform<T> {
+impl<'a, T: Clone + NumCast + Bounded> IntoIterator for &'a Waveform<T> {
     type Item = T;
 
     type IntoIter = WaveformIterator<'a, T>;
@@ -134,7 +134,7 @@ pub struct WaveformIterator<'a, T: Clone> {
     time: f64,
 }
 
-impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
+impl<'a, T: Clone + NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -146,7 +146,16 @@ impl<'a, T: Clone + NumCast> Iterator for WaveformIterator<'a, T> {
             self.time = (1.0 / self.inner.sample_rate) - (f64::MAX - self.time);
         }
 
-        NumCast::from(sample)
+        let result = NumCast::from(sample);
+
+        match result {
+            Some(_) => result,
+            None => match sample.signum() as i32 {
+                -1 => Some(T::min_value()),
+                1 => Some(T::max_value()),
+                _ => panic!("Periodic function returned NaN")
+            }
+        }
     }
 }
 
@@ -217,5 +226,23 @@ mod tests {
 
         assert_eq!(1e5 as usize, samples.len());
         assert_eq!(Some(0f64), iter.next());
+    }
+
+    #[test]
+    fn oversaturated_amplitude_clips_to_max() {
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(300)]);
+        let samples = wf.iter().take(1).collect::<Vec<_>>();
+
+        assert_eq!(samples.len(), 1);
+        assert_eq!(samples[0], u8::MAX);
+    }
+
+    #[test]
+    fn undersaturated_amplitude_clips_to_min() {
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(-300)]);
+        let samples = wf.iter().take(1).collect::<Vec<_>>();
+
+        assert_eq!(samples.len(), 1);
+        assert_eq!(samples[0], u8::MIN);
     }
 }
