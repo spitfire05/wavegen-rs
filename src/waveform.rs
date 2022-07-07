@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use alloc::{vec, vec::Vec};
 
-use num_traits::{NumCast, Bounded};
+use num_traits::{Bounded, NumCast};
 
 use crate::PeriodicFunction;
 
@@ -13,13 +13,13 @@ pub struct Waveform<T: Clone> {
     _phantom: PhantomData<T>,
 }
 
-impl< T: Clone> Waveform<T> {
+impl<T: Clone> Waveform<T> {
     /// Initializes new empty [Waveform]
     ///
     /// # Panics
-    /// 
+    ///
     /// This method will panic if `sample_rate` is not a finite, positive, non-zero number.
-    /// 
+    ///
     /// # Examples
     ///
     /// ```
@@ -43,9 +43,9 @@ impl< T: Clone> Waveform<T> {
     /// Initializes new [Waveform] with predefined components
     ///
     /// # Panics
-    /// 
+    ///
     /// This method will panic if `sample_rate` is not a finite, positive, non-zero number.
-    /// 
+    ///
     /// # Examples
     ///
     /// ```
@@ -167,8 +167,8 @@ impl<'a, T: Clone + NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
             None => match sample.signum() as i32 {
                 -1 => Some(T::min_value()),
                 1 => Some(T::max_value()),
-                _ => panic!("Periodic function returned NaN")
-            }
+                _ => panic!("Periodic function returned NaN"),
+            },
         }
     }
 }
@@ -224,7 +224,7 @@ mod tests {
                         let wf = Waveform::<f32>::with_components(100.0, vec![$func]);
 
                         let bias = wf.iter().take(100).sum::<f32>() / 100.0;
-                
+
                         assert!(approx_eq!(f32, bias, 0.0, epsilon = EPS));
                     }
                 }
@@ -232,7 +232,7 @@ mod tests {
         };
     }
 
-    test_no_default_bias!{
+    test_no_default_bias! {
         sine: sine!(1)
         // sawtooth: sawtooth!(1) // does not pass currently, see https://github.com/spitfire05/wavegen-rs/issues/17
         square: square!(1)
@@ -273,10 +273,10 @@ mod tests {
                     #[test]
                     #[should_panic]
                     fn [<waveform_new_panics_on_ $name>]() {
-                    
+
                         Waveform::<f64>::new($sample_rate);
                     }
-                    
+
 
                     #[test]
                     #[should_panic]
@@ -288,7 +288,7 @@ mod tests {
         };
     }
 
-    test_wavefrom_panic!{
+    test_wavefrom_panic! {
         nan: f64::NAN
         negative: -1f64
         zero: 0.0
