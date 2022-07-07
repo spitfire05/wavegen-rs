@@ -18,7 +18,7 @@ let wf = Waveform::<f64>::with_components(200.0, vec![sine!(100, 10), dc_bias!(2
 2. Turn it into an iterator and sample
 
 ```rust
-let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
+let some_samples: Vec<f64> = wf.iter().take(200).collect();
 ```
 
 ## Show me some examples!

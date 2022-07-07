@@ -13,7 +13,7 @@
 //! );
 //!
 //! // Use Waveform as (almost) infinite iterator:
-//! let two_seconds_of_samples: Vec<f32> = wf.into_iter().take(400).collect();
+//! let two_seconds_of_samples: Vec<f32> = wf.iter().take(400).collect();
 //! ```
 //!
 //! Look into macros section for a complete list of defined periodic functions and their constructors.
