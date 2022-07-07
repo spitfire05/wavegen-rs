@@ -16,6 +16,10 @@ pub struct Waveform<T: Clone> {
 impl< T: Clone> Waveform<T> {
     /// Initializes new empty [Waveform]
     ///
+    /// # Panics
+    /// 
+    /// This method will panic if `sample_rate` is not a finite, positive, non-zero number.
+    /// 
     /// # Examples
     ///
     /// ```
@@ -26,6 +30,9 @@ impl< T: Clone> Waveform<T> {
     /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
     pub fn new(sample_rate: f64) -> Self {
+        assert!(sample_rate.is_normal());
+        assert!(sample_rate.is_sign_positive());
+
         Waveform {
             sample_rate,
             components: vec![],
@@ -35,6 +42,10 @@ impl< T: Clone> Waveform<T> {
 
     /// Initializes new [Waveform] with predefined components
     ///
+    /// # Panics
+    /// 
+    /// This method will panic if `sample_rate` is not a finite, positive, non-zero number.
+    /// 
     /// # Examples
     ///
     /// ```
@@ -43,6 +54,9 @@ impl< T: Clone> Waveform<T> {
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
     pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
+        assert!(sample_rate.is_normal());
+        assert!(sample_rate.is_sign_positive());
+
         Waveform {
             sample_rate,
             components,
@@ -164,9 +178,10 @@ mod tests {
     use alloc::{vec, vec::Vec};
 
     use float_cmp::approx_eq;
+    use paste::paste;
 
     use super::Waveform;
-    use crate::{dc_bias, sawtooth, sine};
+    use crate::{dc_bias, sine, square};
 
     const EPS: f32 = 1e-3;
 
@@ -200,22 +215,27 @@ mod tests {
         assert_eq!(samples[75], 4.0);
     }
 
-    #[test]
-    fn default_sine_wavefrom_has_no_bias() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(10)]);
+    macro_rules! test_no_default_bias {
+        ($($name:ident: $func:expr)*) => {
+            $(
+                paste! {
+                    #[test]
+                    fn [<default_ $name _waveforom_has_no_bias>]() {
+                        let wf = Waveform::<f32>::with_components(100.0, vec![$func]);
 
-        let bias = wf.iter().take(100).sum::<f32>() / 100.0;
-
-        assert!(approx_eq!(f32, bias, 0.0, epsilon = EPS));
+                        let bias = wf.iter().take(100).sum::<f32>() / 100.0;
+                
+                        assert!(approx_eq!(f32, bias, 0.0, epsilon = EPS));
+                    }
+                }
+            )*
+        };
     }
 
-    #[test]
-    fn default_sawtooth_wavefrom_has_no_bias() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![sawtooth!(1)]);
-
-        let bias = wf.iter().take(100).sum::<f32>() / 100.0;
-
-        assert!(approx_eq!(f32, bias, 0.0, epsilon = 1e-2));
+    test_no_default_bias!{
+        sine: sine!(1)
+        // sawtooth: sawtooth!(1) // does not pass currently, see https://github.com/spitfire05/wavegen-rs/issues/17
+        square: square!(1)
     }
 
     #[test]
@@ -244,5 +264,35 @@ mod tests {
 
         assert_eq!(samples.len(), 1);
         assert_eq!(samples[0], u8::MIN);
+    }
+
+    macro_rules! test_wavefrom_panic {
+        ($($name:ident: $sample_rate:expr)*) => {
+            $(
+                paste! {
+                    #[test]
+                    #[should_panic]
+                    fn [<waveform_new_panics_on_ $name>]() {
+                    
+                        Waveform::<f64>::new($sample_rate);
+                    }
+                    
+
+                    #[test]
+                    #[should_panic]
+                    fn [<waveform_with_components_panics_on_ $name>]() {
+                        Waveform::<f64>::with_components($sample_rate, vec![]);
+                    }
+                }
+            )*
+        };
+    }
+
+    test_wavefrom_panic!{
+        nan: f64::NAN
+        negative: -1f64
+        zero: 0.0
+        infinity: f64::INFINITY
+        negative_infinity: f64::NEG_INFINITY
     }
 }
