@@ -167,11 +167,9 @@ impl<'a, T: Clone + NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
             None => {
                 if sample > 0.0 {
                     Some(T::max_value())
-                }
-                else if sample < 0.0 {
+                } else if sample < 0.0 {
                     Some(T::min_value())
-                }
-                else {
+                } else {
                     panic!("Sample {} cannot be converted to waveform type.", sample);
                 }
             }
