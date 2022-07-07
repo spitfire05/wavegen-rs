@@ -164,11 +164,17 @@ impl<'a, T: Clone + NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
 
         match result {
             Some(_) => result,
-            None => match sample.signum() as i32 {
-                -1 => Some(T::min_value()),
-                1 => Some(T::max_value()),
-                _ => panic!("Periodic function returned NaN"),
-            },
+            None => {
+                if sample > 0.0 {
+                    Some(T::max_value())
+                }
+                else if sample < 0.0 {
+                    Some(T::min_value())
+                }
+                else {
+                    panic!("Sample {} cannot be converted to waveform type.", sample);
+                }
+            }
         }
     }
 }
