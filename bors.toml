@@ -1,3 +1,2 @@
 status = [ "Done" ]
 delete_merged_branches = true
-use_squash_merge = true
