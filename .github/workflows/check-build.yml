@@ -1,14 +1,10 @@
 name: Rust
 
 on:
+  push:
+    branches: [master, staging, trying]
   pull_request:
-    branches: [ "master" ]
-    paths:
-      - "src/**"
-      - "examples/**"
-      - "benches/**"
-      - "Cargo.toml"
-  
+    branches: [ master ]
   workflow_dispatch:
 
 env:

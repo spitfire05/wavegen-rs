@@ -2,6 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/wavegen)](https://crates.io/crates/wavegen)
 [![docs](https://img.shields.io/docsrs/wavegen)](https://docs.rs/wavegen)
+[![Bors enabled](https://bors.tech/images/badge_small.svg)](https://app.bors.tech/repositories/46467)
 
 `wavegen` is a wavefrom generator made with 🦀
 
