@@ -5,8 +5,6 @@
 
 `wavegen` is a wavefrom generator made with 🦀
 
-Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.
-
 ## How to use it?
 
 1) Define a waveform with sampling frequency and function components
@@ -23,6 +21,8 @@ let wf = Waveform::<f64>::with_components(200.0, vec![
 ```rust
 let some_samples: Vec<f64> = wf.iter().take(200).collect();
 ```
+
+Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.
 
 ## Show me some examples!
 
