@@ -21,9 +21,11 @@
 //! # Periodic function macros
 //! The macros for building predefined [PeriodicFunction]s generally have a form of:
 //!
-//! `function!(frequency, amplitude, phase)`
+//! `function!(frequency, [amplitude, [phase]])`
 //!
-//! They come in an annotated and non-annotated form, so for exmaple a Sine function can be expressed in both ways:
+//! (Square braces "[]" indicate optional argument).
+//!
+//! They come in an annotated and non-annotated form, so for example a Sine function can be expressed in both ways:
 //! ```
 //! use wavegen::sine;
 //!
@@ -33,7 +35,7 @@
 //! ```
 //! use wavegen::sine;
 //!
-//! let sine_f = sine!(frequency = 100, amplitude = 20, phase = 0.25);
+//! let sine_f = sine!(frequency: 100, amplitude: 20, phase: 0.25);
 //! ```
 //!
 //! Refer to Macros section for more info.
