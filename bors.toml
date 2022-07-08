@@ -1,2 +1,2 @@
-status = [ "build%", "lint" ]
+status = [ "Done" ]
 delete_merged_branches = true
