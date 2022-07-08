@@ -67,3 +67,9 @@ wavegen = { version = "0.2", default-features = false, features = ["libm"] }
 
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
+
+## Breaking changes
+
+### 0.2
+
+0.2 intorduces a braking chnage in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
