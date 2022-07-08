@@ -43,7 +43,7 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// ```
 /// use wavegen::sine;
 ///
-/// let sine = sine!(frequency = 50, amplitude = 20);
+/// let sine = sine!(frequency: 50, amplitude: 20);
 /// ```
 ///
 /// 50 Hz sine of amplitude 20 and phase shift of half a turn
@@ -55,13 +55,13 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// ```
 #[macro_export]
 macro_rules! sine {
-    (frequency = $frequency:expr) => {
+    (frequency: $frequency:expr) => {
         sine!($frequency)
     };
-    (frequency = $frequency:expr, amplitude = $amplitude:expr) => {
+    (frequency: $frequency:expr, amplitude: $amplitude:expr) => {
         sine!($frequency, $amplitude)
     };
-    (frequency = $frequency:expr, amplitude = $amplitude:expr, phase = $phase:expr) => {
+    (frequency: $frequency:expr, amplitude: $amplitude:expr, phase: $phase:expr) => {
         sine!($frequency, $amplitude, $phase)
     };
     ($frequency:expr) => {

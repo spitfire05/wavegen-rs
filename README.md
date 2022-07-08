@@ -12,7 +12,10 @@ Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage exam
 1) Define a waveform with sampling frequency and function components
 
 ```rust
-let wf = Waveform::<f64>::with_components(200.0, vec![sine!(100, 10), dc_bias!(20)]);
+let wf = Waveform::<f64>::with_components(200.0, vec![
+        sine!(frequency: 100, amplitude: 10),
+        dc_bias!(20)
+    ]);
 ```
 
 2. Turn it into an iterator and sample

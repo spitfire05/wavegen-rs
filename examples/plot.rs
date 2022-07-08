@@ -47,7 +47,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Sawtooth with sine",
         Waveform::<f32>::with_components(
             sample_rate,
-            vec![sawtooth!(2, 1, 0.0), sine!(frequency = 50, amplitude = 0.1)]
+            vec![sawtooth!(2, 1, 0.0), sine!(frequency: 50, amplitude: 0.1)]
         )
     )?;
 
@@ -75,8 +75,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Waveform::<f32>::with_components(
             sample_rate,
             vec![
-                sine!(frequency = 300),
-                sine!(frequency = 50, amplitude = 0.3)
+                sine!(frequency: 300),
+                sine!(frequency: 50, amplitude: 0.3)
             ]
         )
     )?;

@@ -33,7 +33,7 @@
 //! ```
 //! use wavegen::sine;
 //!
-//! let sine_f = sine!(frequency = 100, amplitude = 20, phase = 0.25);
+//! let sine_f = sine!(frequency: 100, amplitude: 20, phase: 0.25);
 //! ```
 //!
 //! Refer to Macros section for more info.
