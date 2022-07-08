@@ -1,2 +1,2 @@
-status = [ "Rust" ]
+status = [ "build", "lint" ]
 delete_merged_branches = true
