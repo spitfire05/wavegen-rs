@@ -9,7 +9,7 @@ macro_rules! draw {
             $path,
             $label,
             $waveform
-                .into_iter()
+                .iter()
                 .enumerate()
                 .map(|(i, x)| (i as f32 / $sample_rate as f32, x))
                 .take($sample_rate as usize),

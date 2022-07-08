@@ -1,4 +1,4 @@
-//! Rust waveform generator, with no_std support out of the box.
+//! Rust waveform generator, with no_std support.
 //!
 //! # Quickstart
 //!
@@ -13,7 +13,7 @@
 //! );
 //!
 //! // Use Waveform as (almost) infinite iterator:
-//! let two_seconds_of_samples: Vec<f32> = wf.into_iter().take(400).collect();
+//! let two_seconds_of_samples: Vec<f32> = wf.iter().take(400).collect();
 //! ```
 //!
 //! Look into macros section for a complete list of defined periodic functions and their constructors.
@@ -64,6 +64,12 @@
 
 #![no_std]
 #![deny(missing_docs)]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+#[cfg(all(not(feature = "libm"), not(feature = "std")))]
+compile_error!("at least one of \"libm\", \"std\" features has to be enabled");
 
 extern crate alloc;
 

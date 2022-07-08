@@ -1,11 +1,11 @@
 # wavegen
 
 [![Crates.io](https://img.shields.io/crates/v/wavegen)](https://crates.io/crates/wavegen)
-[![docs](https://img.shields.io/docsrs/wavegen)](https://docs.rs/wavegen/0.1.0/wavegen/)
+[![docs](https://img.shields.io/docsrs/wavegen)](https://docs.rs/wavegen)
 
 `wavegen` is a wavefrom generator made with 🦀
 
-Refer to [documentation](https://docs.rs/wavegen/0.1.0/wavegen/) for usage examples.
+Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.
 
 ## How to use it?
 
@@ -18,7 +18,7 @@ let wf = Waveform::<f64>::with_components(200.0, vec![sine!(100, 10), dc_bias!(2
 2. Turn it into an iterator and sample
 
 ```rust
-let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
+let some_samples: Vec<f64> = wf.iter().take(200).collect();
 ```
 
 ## Show me some examples!
@@ -53,9 +53,14 @@ let some_samples: Vec<f64> = wf.into_iter().take(200).collect();
 
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
 
-## `no_std`?
+## `no_std`
 
-Yes. This crate requires no standard library features, and uses the `no_std` declaration.
+`no_std` support can be enabled by disabling the default `std` feature and enabling the `libm` backend, required for math functions:
+
+```toml
+[dependencies]
+wavegen = { version = "0.2", default-features = false, features = ["libm"] }
+```
 
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
