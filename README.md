@@ -8,7 +8,20 @@
 
 ## How to use it?
 
-1) Define a waveform with sampling frequency and function components
+1) Add `wavegen` to your project:
+
+```toml
+[dependencies]
+wavegen = "0.2"
+```
+Or, to use the *no_std* version:
+
+```toml
+[dependencies]
+wavegen = { version = "0.2", default-features = false, features = ["libm"] }
+```
+
+2) Define a waveform with sampling frequency and function components:
 
 ```rust
 let wf = Waveform::<f64>::with_components(200.0, vec![
@@ -17,7 +30,7 @@ let wf = Waveform::<f64>::with_components(200.0, vec![
     ]);
 ```
 
-2. Turn it into an iterator and sample
+3) Turn it into an iterator and sample:
 
 ```rust
 let some_samples: Vec<f64> = wf.iter().take(200).collect();
@@ -57,15 +70,6 @@ Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage exam
 
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
 
-## `no_std`
-
-`no_std` support can be enabled by disabling the default `std` feature and enabling the `libm` backend, required for math functions:
-
-```toml
-[dependencies]
-wavegen = { version = "0.2", default-features = false, features = ["libm"] }
-```
-
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
 
@@ -73,4 +77,4 @@ wavegen = { version = "0.2", default-features = false, features = ["libm"] }
 
 ### 0.2
 
-0.2 intorduces a braking chnage in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
+0.2 intorduces a braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
