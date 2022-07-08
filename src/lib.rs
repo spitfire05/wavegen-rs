@@ -22,7 +22,7 @@
 //! The macros for building predefined [PeriodicFunction]s generally have a form of:
 //!
 //! `function!(frequency, [amplitude, [phase]])`
-//! 
+//!
 //! (Square braces "[]" indicate optional argument).
 //!
 //! They come in an annotated and non-annotated form, so for example a Sine function can be expressed in both ways:
