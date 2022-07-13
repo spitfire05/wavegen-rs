@@ -85,4 +85,4 @@ use alloc::boxed::Box;
 pub use waveform::Waveform;
 
 /// Type alias defining a periodic function (f64 -> f64 map)
-pub type PeriodicFunction = Box<dyn Fn(f64) -> f64>;
+pub type PeriodicFunction = Box<dyn Fn(f64) -> f64 + Send + Sync>;
