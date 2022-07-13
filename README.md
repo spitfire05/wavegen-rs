@@ -40,6 +40,12 @@ Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage exam
 
 ## Show me some examples!
 
+### Interactive demo
+
+Check out the demo at https://wavegen-demo.netlify.app
+
+### Plot charts
+
 * Simple sine
 
 ![Sine plot](img/sine.png)
