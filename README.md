@@ -2,26 +2,49 @@
 
 [![Crates.io](https://img.shields.io/crates/v/wavegen)](https://crates.io/crates/wavegen)
 [![docs](https://img.shields.io/docsrs/wavegen)](https://docs.rs/wavegen)
+[![Bors enabled](https://bors.tech/images/badge_small.svg)](https://app.bors.tech/repositories/46467)
 
 `wavegen` is a wavefrom generator made with 🦀
 
-Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.
-
 ## How to use it?
 
-1) Define a waveform with sampling frequency and function components
+1) Add `wavegen` to your project:
 
-```rust
-let wf = Waveform::<f64>::with_components(200.0, vec![sine!(100, 10), dc_bias!(20)]);
+```toml
+[dependencies]
+wavegen = "0.2"
+```
+Or, to use the *no_std* version:
+
+```toml
+[dependencies]
+wavegen = { version = "0.2", default-features = false, features = ["libm"] }
 ```
 
-2. Turn it into an iterator and sample
+2) Define a waveform with sampling frequency and function components:
+
+```rust
+let wf = Waveform::<f64>::with_components(200.0, vec![
+        sine!(frequency: 100, amplitude: 10),
+        dc_bias!(20)
+    ]);
+```
+
+3) Turn it into an iterator and sample:
 
 ```rust
 let some_samples: Vec<f64> = wf.iter().take(200).collect();
 ```
 
+Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.
+
 ## Show me some examples!
+
+### Interactive demo
+
+Check out the demo at https://wavegen-demo.netlify.app
+
+### Plot charts
 
 * Simple sine
 
@@ -53,14 +76,11 @@ let some_samples: Vec<f64> = wf.iter().take(200).collect();
 
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
 
-## `no_std`
-
-`no_std` support can be enabled by disabling the default `std` feature and enabling the `libm` backend, required for math functions:
-
-```toml
-[dependencies]
-wavegen = { version = "0.2", default-features = false, features = ["libm"] }
-```
-
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
+
+## Breaking changes
+
+### 0.2
+
+0.2 intorduces a braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`

@@ -1,14 +1,10 @@
 name: Rust
 
 on:
+  push:
+    branches: [master, staging, trying]
   pull_request:
-    branches: [ "master" ]
-    paths:
-      - "src/**"
-      - "examples/**"
-      - "benches/**"
-      - "Cargo.toml"
-  
+    branches: [ master ]
   workflow_dispatch:
 
 env:
@@ -54,3 +50,13 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         args: --all-features
+        
+  # This job should depend on all required jobs.
+  # We will make Bors watch this job to tell whether to merge or not.
+  done:
+    name: Done
+    needs: [build, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Done
+        run: echo Done

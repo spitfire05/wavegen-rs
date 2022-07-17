@@ -30,13 +30,13 @@ pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
 #[macro_export]
 macro_rules! square {
-    (frequency = $frequency:expr) => {
+    (frequency: $frequency:expr) => {
         square!($frequency)
     };
-    (frequency = $frequency:expr, amplitude = $amplitude:expr) => {
+    (frequency: $frequency:expr, amplitude: $amplitude:expr) => {
         square!($frequency, $amplitude)
     };
-    (frequency = $frequency:expr, amplitude = $amplitude:expr, phase = $phase:expr) => {
+    (frequency: $frequency:expr, amplitude: $amplitude:expr, phase: $phase:expr) => {
         square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr) => {
