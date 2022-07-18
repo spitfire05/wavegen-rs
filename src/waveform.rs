@@ -175,6 +175,10 @@ impl<'a, T: Clone + NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
             }
         }
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (usize::MAX, None)
+    }
 }
 
 #[cfg(test)]
@@ -185,7 +189,7 @@ mod tests {
     use paste::paste;
 
     use super::Waveform;
-    use crate::{dc_bias, sine, square};
+    use crate::{dc_bias, sine, square, sawtooth};
 
     const EPS: f32 = 1e-3;
 
@@ -298,5 +302,26 @@ mod tests {
         zero: 0.0
         infinity: f64::INFINITY
         negative_infinity: f64::NEG_INFINITY
+    }
+
+    macro_rules! test_size_hint {
+        () => {
+            let wf = Waveform::<f32>::new(44100.0);
+            assert_eq!((usize::MAX, None), wf.iter().size_hint());
+        };
+        ($($component:expr,)*) => {
+            let mut wf = Waveform::<f32>::new(44100.0);
+            $(
+                wf.add_component($component);
+            )*
+            assert_eq!((usize::MAX, None), wf.iter().size_hint());
+        };
+    }
+
+    #[test]
+    fn test_size_hint() {
+        test_size_hint!();
+        test_size_hint!(sine!(50),);
+        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4),);
     }
 }
