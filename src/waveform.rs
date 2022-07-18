@@ -189,7 +189,7 @@ mod tests {
     use paste::paste;
 
     use super::Waveform;
-    use crate::{dc_bias, sine, square, sawtooth};
+    use crate::{dc_bias, sawtooth, sine, square};
 
     const EPS: f32 = 1e-3;
 
