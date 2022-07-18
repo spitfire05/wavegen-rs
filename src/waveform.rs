@@ -7,13 +7,13 @@ use num_traits::{Bounded, NumCast};
 use crate::PeriodicFunction;
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
-pub struct Waveform<T: Clone> {
+pub struct Waveform<T: NumCast + Bounded> {
     sample_rate: f64,
     components: Vec<PeriodicFunction>,
     _phantom: PhantomData<T>,
 }
 
-impl<T: Clone> Waveform<T> {
+impl<T: NumCast + Bounded> Waveform<T> {
     /// Initializes new empty [Waveform]
     ///
     /// # Panics
@@ -129,7 +129,7 @@ impl<T: Clone> Waveform<T> {
     }
 }
 
-impl<'a, T: Clone + NumCast + Bounded> IntoIterator for &'a Waveform<T> {
+impl<'a, T: NumCast + Bounded> IntoIterator for &'a Waveform<T> {
     type Item = T;
 
     type IntoIter = WaveformIterator<'a, T>;
@@ -143,12 +143,12 @@ impl<'a, T: Clone + NumCast + Bounded> IntoIterator for &'a Waveform<T> {
 }
 
 #[derive(Clone, Copy)]
-pub struct WaveformIterator<'a, T: Clone> {
+pub struct WaveformIterator<'a, T: NumCast + Bounded> {
     inner: &'a Waveform<T>,
     time: f64,
 }
 
-impl<'a, T: Clone + NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
+impl<'a, T: NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
