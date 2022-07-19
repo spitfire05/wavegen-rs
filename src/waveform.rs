@@ -344,14 +344,11 @@ mod tests {
     #[test]
     fn nth_and_next_give_same_results() {
         let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
-        let i1 = wf.iter();
-        let mut i2 = i1.clone();
+        let mut i1 = wf.iter();
+        let mut i2 = wf.iter();
 
-        for i in 0..1000 {
-            assert_eq!(
-                *i1.take(i + 1).collect::<Vec<_>>().last().unwrap(),
-                i2.nth(0).unwrap()
-            );
+        for _ in 0..1000 {
+            assert_eq!(i1.next().unwrap(), i2.nth(0).unwrap());
         }
     }
 }
