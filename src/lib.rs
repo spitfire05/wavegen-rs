@@ -12,7 +12,7 @@
 //!     vec![sine!(50, 10), sawtooth!(20), dc_bias!(-5)]
 //! );
 //!
-//! // Use Waveform as (almost) infinite iterator:
+//! // Use Waveform as an infinite iterator:
 //! let two_seconds_of_samples: Vec<f32> = wf.iter().take(400).collect();
 //! ```
 //!
