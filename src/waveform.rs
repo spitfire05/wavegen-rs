@@ -148,18 +148,8 @@ pub struct WaveformIterator<'a, T: NumCast + Bounded> {
     time: f64,
 }
 
-impl<'a, T: NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
-    type Item = T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let sample: f64 = self.inner.components.iter().map(|x| x(self.time)).sum();
-        let new_time = self.time + 1.0 / self.inner.sample_rate;
-        if new_time.is_finite() {
-            self.time = new_time;
-        } else {
-            self.time = (1.0 / self.inner.sample_rate) - (f64::MAX - self.time);
-        }
-
+impl<'a, T: NumCast + Bounded> WaveformIterator<'a, T> {
+    fn into_target_type_sanitized(sample: f64) -> Option<T> {
         let result = NumCast::from(sample);
 
         result.or_else(|| {
@@ -168,9 +158,39 @@ impl<'a, T: NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
             } else if sample < 0.0 {
                 Some(T::min_value())
             } else {
-                panic!();
+                panic!("Sample {} cannot be converted to waveform type.", sample);
             }
         })
+    }
+
+    fn increment_time(&mut self, n: usize) {
+        let new_time = self.time + (n as f64 * (1.0 / self.inner.sample_rate));
+        if new_time.is_finite() {
+            self.time = new_time;
+        } else {
+            self.time = (1.0 / self.inner.sample_rate) - (f64::MAX - self.time);
+        }
+    }
+
+    fn raw_sample(&self) -> f64 {
+        self.inner.components.iter().map(|x| x(self.time)).sum()
+    }
+}
+
+impl<'a, T: NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let sample: f64 = self.raw_sample();
+        self.increment_time(1);
+
+        Self::into_target_type_sanitized(sample)
+    }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.increment_time(n);
+        
+        self.next()
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -246,11 +266,10 @@ mod tests {
     #[test]
     fn waveform_iterator_is_infinite() {
         let wf = Waveform::<f64>::new(f64::MIN_POSITIVE);
-        let mut iter = wf.iter();
-        let samples = iter.take(1e5 as usize).collect::<Vec<_>>();
+        let mut iter = wf.iter().skip(usize::MAX);
 
-        assert_eq!(1e5 as usize, samples.len());
         assert_eq!(Some(0f64), iter.next());
+        assert_eq!(Some(0f64), iter.skip(usize::MAX).next())
     }
 
     #[test]
@@ -320,5 +339,17 @@ mod tests {
         test_size_hint!();
         test_size_hint!(sine!(50),);
         test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4),);
+    }
+
+    #[test]
+    fn nth_and_next_give_same_results() {
+        let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
+        let i1 = wf.iter();
+        let mut i2 = i1.clone();
+
+        for i in 0..1000 {
+            assert_eq!(*i1.take(i + 1).collect::<Vec<_>>().last().unwrap(), i2.nth(0).unwrap());
+        }
+        
     }
 }
