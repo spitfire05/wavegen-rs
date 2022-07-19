@@ -116,7 +116,7 @@ impl<T: NumCast + Bounded> Waveform<T> {
     /// # Examples
     ///
     /// ```
-    /// use wavegen::{Waveform, sine, dc_bias};
+    /// use wavegen::{Waveform, sine};
     ///
     /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1)]);
     /// let samples = wf.iter().take(100).collect::<Vec<_>>();
