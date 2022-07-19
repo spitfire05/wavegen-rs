@@ -189,7 +189,7 @@ impl<'a, T: NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
         self.increment_time(n);
-        
+
         self.next()
     }
 
@@ -348,8 +348,10 @@ mod tests {
         let mut i2 = i1.clone();
 
         for i in 0..1000 {
-            assert_eq!(*i1.take(i + 1).collect::<Vec<_>>().last().unwrap(), i2.nth(0).unwrap());
+            assert_eq!(
+                *i1.take(i + 1).collect::<Vec<_>>().last().unwrap(),
+                i2.nth(0).unwrap()
+            );
         }
-        
     }
 }
