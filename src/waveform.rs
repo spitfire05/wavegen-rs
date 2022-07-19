@@ -162,18 +162,15 @@ impl<'a, T: NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
 
         let result = NumCast::from(sample);
 
-        match result {
-            Some(_) => result,
-            None => {
-                if sample > 0.0 {
-                    Some(T::max_value())
-                } else if sample < 0.0 {
-                    Some(T::min_value())
-                } else {
-                    panic!("Sample {} cannot be converted to waveform type.", sample);
-                }
+        result.or_else(|| {
+            if sample > 0.0 {
+                Some(T::max_value())
+            } else if sample < 0.0 {
+                Some(T::min_value())
+            } else {
+                panic!();
             }
-        }
+        })
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
