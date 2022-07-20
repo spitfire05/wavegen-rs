@@ -79,6 +79,10 @@ All above examples are generated with simple program found in `examples/plot.rs`
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
 
+## MSRV
+
+The *Minimum Supported Rust Version* is `1.56.1`.
+
 ## Breaking changes
 
 ### 0.2
