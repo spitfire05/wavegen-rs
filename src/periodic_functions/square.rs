@@ -37,6 +37,14 @@ pub fn _square_internal(frequency: f64, amplitude: f64, phase: f64) -> PeriodicF
 /// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
 /// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
 /// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
+/// 
+/// # Panics
+/// 
+/// This macro will cause panic if:
+/// 
+/// * `frequency` is not non-zero, positive, finite number.
+/// * `amplitude` is `NaN` or negative.
+/// * `phase` is `NaN` or non finite.
 #[macro_export]
 macro_rules! square {
     (frequency: $frequency:expr) => {

@@ -12,6 +12,10 @@ pub fn _dc_bias(bias: f64) -> PeriodicFunction {
 ///
 /// Takes just one argument - the bias value.
 ///
+/// # Panics
+/// 
+/// This macro will cause panic if `bias` is `NaN`
+/// 
 /// # Examples
 ///
 /// Defines bias of amplitude +10
