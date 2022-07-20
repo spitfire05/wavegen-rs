@@ -163,7 +163,7 @@ impl<'a, T: SampleType> WaveformIterator<'a, T> {
             } else if sample < 0.0 {
                 Some(T::min_value())
             } else {
-                panic!("Sample {} cannot be converted to waveform type.", sample);
+                panic!("Sample {} cannot be converted to waveform's sample type.", sample);
             }
         })
     }
@@ -205,7 +205,7 @@ impl<'a, T: SampleType> Iterator for WaveformIterator<'a, T> {
 
 #[cfg(test)]
 mod tests {
-    use alloc::{vec, vec::Vec};
+    use alloc::{vec, vec::Vec, boxed::Box};
 
     use float_cmp::approx_eq;
     use paste::paste;
@@ -355,5 +355,14 @@ mod tests {
         for _ in 0..1000 {
             assert_eq!(i1.next().unwrap(), i2.nth(0).unwrap());
         }
+    }
+
+    #[test]
+    #[should_panic]
+    fn panics_on_custom_not_supported_component() {
+        let func = Box::new(|_: f64| f64::NAN);
+        let wf = Waveform::<i32>::with_components(44100.0, vec![func]);
+        // f64::NAN cannot be cast to i32
+        let _sample = wf.iter().next();
     }
 }
