@@ -76,6 +76,10 @@ Check out the demo at https://wavegen-demo.netlify.app
 
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
 
+## MSRV
+
+The *Minimum Supported Rust Version* is `1.56.1`.
+
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
 
