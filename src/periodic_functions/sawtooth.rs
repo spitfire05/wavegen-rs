@@ -1,7 +1,9 @@
 use alloc::boxed::Box;
 
-use crate::PeriodicFunction;
+use crate::{PeriodicFunction, assert::assert_periodic_params};
+use crate::assert::{assert_value, assert_not_value};
 
+#[inline(always)]
 #[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {
     // this is actually slower than `x - ((x as i64) as f64)` on x86_64-pc-windows-msvc target,
@@ -9,6 +11,7 @@ fn frac(x: f64) -> f64 {
     x.fract()
 }
 
+#[inline(always)]
 #[cfg(all(not(feature = "std"), feature = "libm"))]
 fn frac(x: f64) -> f64 {
     use libm::modf;
@@ -18,10 +21,12 @@ fn frac(x: f64) -> f64 {
 }
 
 pub fn _sawtooth(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    assert_periodic_params!(frequency, amplitude, phase);
+
     Box::new(move |t| 2.0 * amplitude * frac(t * frequency + phase) - amplitude)
 }
 
-/// Builder macro for Sine [PeriodicFunction].
+/// Builder macro for Sawtooth [PeriodicFunction].
 ///
 /// Takes up to 3 arguments - frequency {amplitude, {phase}}
 ///
@@ -60,6 +65,9 @@ macro_rules! sawtooth {
 mod tests {
     use float_cmp::approx_eq;
 
+    use crate::periodic_functions::test_utils::test_panic;
+    use paste::paste;
+
     use super::frac;
 
     const EPS: f64 = 1e-3;
@@ -78,5 +86,22 @@ mod tests {
 
         assert!(approx_eq!(f64, f(0.49999), 1.0, epsilon = EPS));
         assert!(approx_eq!(f64, f(0.5), -1.0, epsilon = EPS));
+    }
+
+    test_panic!{
+        nan, frequency, sawtooth!(f64::NAN)
+        nan, amplitude, sawtooth!(1, f64::NAN)
+        nan, phase, sawtooth!(1, 1, f64::NAN)
+
+        negative, frequency, sawtooth!(-1)
+        negative, amplitude, sawtooth!(1, -1)
+
+        zero, frequency, sawtooth!(0)
+
+        infinite, frequency, sawtooth!(f64::INFINITY)
+        infinite, phase, sawtooth!(1, 1, f64::INFINITY)
+
+        neg_infinite, frequency, sawtooth!(f64::NEG_INFINITY)
+        neg_infinite, phase, sawtooth!(1, 1, f64::NEG_INFINITY)
     }
 }

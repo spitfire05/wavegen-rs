@@ -1,8 +1,10 @@
 use alloc::boxed::Box;
 
-use crate::PeriodicFunction;
+use crate::{PeriodicFunction, assert::{assert_not_value}};
 
 pub fn _dc_bias(bias: f64) -> PeriodicFunction {
+    assert_not_value!(bias, is_nan);
+
     Box::new(move |_| bias)
 }
 
@@ -29,6 +31,10 @@ macro_rules! dc_bias {
 
 #[cfg(test)]
 mod tests {
+    use paste::paste;
+
+    use crate::periodic_functions::test_utils::test_panic;
+
     #[test]
     fn dc_bias_is_const_for_any_input() {
         let y = 42.0;
@@ -36,5 +42,9 @@ mod tests {
         for x in (0..10000000).map(|x| x as f64) {
             assert_eq!(dc(x), y);
         }
+    }
+
+    test_panic!{
+        nan, amplitude, dc_bias!(f64::NAN)
     }
 }

@@ -1,9 +1,17 @@
 use alloc::boxed::Box;
 
-use crate::PeriodicFunction;
+use crate::{PeriodicFunction, assert::assert_periodic_params};
+use crate::assert::{assert_value, assert_not_value};
 
-#[cfg(all(not(feature = "libm"), feature = "std"))]
 pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    assert_periodic_params!(frequency, amplitude, phase);
+
+    _square_internal(frequency, amplitude, phase)
+}
+
+#[inline(always)]
+#[cfg(all(not(feature = "libm"), feature = "std"))]
+pub fn _square_internal(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
     Box::new(move |t| {
         let power = (2.0 * (t - phase) * frequency).floor() as i32;
@@ -12,8 +20,9 @@ pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     })
 }
 
+#[inline(always)]
 #[cfg(feature = "libm")]
-pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+pub fn _square_internal(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
     use libm::{floor, pow};
     Box::new(move |t| amplitude * pow(-1.0, floor(2.0 * (t - phase) * frequency)))
@@ -58,6 +67,9 @@ macro_rules! square {
 mod tests {
     use float_cmp::approx_eq;
 
+    use crate::periodic_functions::test_utils::test_panic;
+    use paste::paste;
+
     const EPS: f64 = 1e-3;
 
     #[test]
@@ -71,5 +83,22 @@ mod tests {
         for x in [0.5, 0.6, 0.7, 0.8, 0.9] {
             assert!(approx_eq!(f64, square(x), -1.0, epsilon = EPS))
         }
+    }
+
+    test_panic!{
+        nan, frequency, square!(f64::NAN)
+        nan, amplitude, square!(1, f64::NAN)
+        nan, phase, square!(1, 1, f64::NAN)
+
+        negative, frequency, square!(-1)
+        negative, amplitude, square!(1, -1)
+
+        zero, frequency, square!(0)
+
+        infinite, frequency, square!(f64::INFINITY)
+        infinite, phase, square!(1, 1, f64::INFINITY)
+
+        neg_infinite, frequency, square!(f64::NEG_INFINITY)
+        neg_infinite, phase, square!(1, 1, f64::NEG_INFINITY)
     }
 }

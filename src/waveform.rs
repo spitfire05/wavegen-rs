@@ -4,7 +4,7 @@ use alloc::{vec, vec::Vec};
 
 use num_traits::{Bounded, NumCast};
 
-use crate::PeriodicFunction;
+use crate::{PeriodicFunction, assert::assert_value};
 
 /// Helper trait defining all the types that can be used as [Waveform]'s sample type.
 pub trait SampleType: NumCast + Bounded {}
@@ -35,7 +35,8 @@ impl<T: SampleType> Waveform<T> {
     /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
     pub fn new(sample_rate: f64) -> Self {
-        Self::assert_sane(sample_rate);
+        assert_value!(sample_rate, is_sign_positive);
+        assert_value!(sample_rate, is_normal);
 
         Waveform {
             sample_rate,
@@ -58,7 +59,8 @@ impl<T: SampleType> Waveform<T> {
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
     pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
-        Self::assert_sane(sample_rate);
+        assert_value!(sample_rate, is_sign_positive);
+        assert_value!(sample_rate, is_normal);
 
         Waveform {
             sample_rate,
@@ -129,12 +131,6 @@ impl<T: SampleType> Waveform<T> {
             inner: self,
             time: 0.0,
         }
-    }
-
-    #[inline(always)]
-    fn assert_sane(x: f64) {
-        assert!(x.is_normal());
-        assert!(x.is_sign_positive());
     }
 }
 
@@ -334,7 +330,7 @@ mod tests {
             let wf = Waveform::<f32>::new(44100.0);
             assert_eq!((usize::MAX, None), wf.iter().size_hint());
         };
-        ($($component:expr,)*) => {
+        ($($component:expr),*) => {
             let mut wf = Waveform::<f32>::new(44100.0);
             $(
                 wf.add_component($component);
@@ -346,8 +342,8 @@ mod tests {
     #[test]
     fn test_size_hint() {
         test_size_hint!();
-        test_size_hint!(sine!(50),);
-        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4),);
+        test_size_hint!(sine!(50));
+        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4));
     }
 
     #[test]

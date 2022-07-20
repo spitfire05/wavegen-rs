@@ -104,6 +104,7 @@ extern crate alloc;
 pub mod periodic_functions;
 
 mod waveform;
+mod assert;
 
 use alloc::boxed::Box;
 

@@ -3,9 +3,18 @@ use core::f64::consts::PI;
 use alloc::boxed::Box;
 
 use crate::PeriodicFunction;
+use crate::assert::{assert_value, assert_not_value};
+use crate::assert::assert_periodic_params;
 
-#[cfg(all(not(feature = "libm"), feature = "std"))]
 pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    assert_periodic_params!(frequency, amplitude, phase);
+
+    _sine_internal(frequency, amplitude, phase)
+}
+
+#[inline(always)]
+#[cfg(all(not(feature = "libm"), feature = "std"))]
+pub fn _sine_internal(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     Box::new(move |t| {
         let radians = (2.0 * PI * frequency * t) + (phase * 2.0 * PI);
         let sine = radians.sin();
@@ -14,8 +23,9 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     })
 }
 
+#[inline(always)]
 #[cfg(feature = "libm")]
-pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+pub fn _sine_internal(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     use libm::sin;
     Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
 }
@@ -78,6 +88,9 @@ macro_rules! sine {
 #[cfg(test)]
 mod tests {
     use float_cmp::approx_eq;
+    use paste::paste;
+
+    use crate::periodic_functions::test_utils::test_panic;
 
     const EPS: f64 = 1e-3;
 
@@ -106,4 +119,22 @@ mod tests {
         assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
         assert!(approx_eq!(f64, zero, 0.0, epsilon = EPS));
     }
+
+    test_panic!{
+        nan, frequency, sine!(f64::NAN)
+        nan, amplitude, sine!(1, f64::NAN)
+        nan, phase, sine!(1, 1, f64::NAN)
+
+        negative, frequency, sine!(-1)
+        negative, amplitude, sine!(1, -1)
+
+        zero, frequency, sine!(0)
+        
+        infinite, frequency, sine!(f64::INFINITY)
+        infinite, phase, sine!(1, 1, f64::INFINITY)
+
+        neg_infinite, frequency, sine!(f64::NEG_INFINITY)
+        neg_infinite, phase, sine!(1, 1, f64::NEG_INFINITY)
+    }
+
 }
