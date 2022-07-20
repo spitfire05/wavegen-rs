@@ -6,14 +6,19 @@ use num_traits::{Bounded, NumCast};
 
 use crate::PeriodicFunction;
 
+/// Helper trait defining all the types that cna be used as [Waveform]'s sample type.
+pub trait SampleType: NumCast + Bounded {}
+
+impl<T> SampleType for T where T: NumCast + Bounded {}
+
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
-pub struct Waveform<T: NumCast + Bounded> {
+pub struct Waveform<T: SampleType> {
     sample_rate: f64,
     components: Vec<PeriodicFunction>,
     _phantom: PhantomData<T>,
 }
 
-impl<T: NumCast + Bounded> Waveform<T> {
+impl<T: SampleType> Waveform<T> {
     /// Initializes new empty [Waveform]
     ///
     /// # Panics
@@ -30,8 +35,7 @@ impl<T: NumCast + Bounded> Waveform<T> {
     /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
     pub fn new(sample_rate: f64) -> Self {
-        assert!(sample_rate.is_normal());
-        assert!(sample_rate.is_sign_positive());
+        Self::assert_sane(sample_rate);
 
         Waveform {
             sample_rate,
@@ -54,8 +58,7 @@ impl<T: NumCast + Bounded> Waveform<T> {
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
     pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
-        assert!(sample_rate.is_normal());
-        assert!(sample_rate.is_sign_positive());
+        Self::assert_sane(sample_rate);
 
         Waveform {
             sample_rate,
@@ -127,9 +130,15 @@ impl<T: NumCast + Bounded> Waveform<T> {
             time: 0.0,
         }
     }
+
+    #[inline(always)]
+    fn assert_sane(x: f64) {
+        assert!(x.is_normal());
+        assert!(x.is_sign_positive());
+    }
 }
 
-impl<'a, T: NumCast + Bounded> IntoIterator for &'a Waveform<T> {
+impl<'a, T: SampleType> IntoIterator for &'a Waveform<T> {
     type Item = T;
 
     type IntoIter = WaveformIterator<'a, T>;
@@ -143,12 +152,12 @@ impl<'a, T: NumCast + Bounded> IntoIterator for &'a Waveform<T> {
 }
 
 #[derive(Clone, Copy)]
-pub struct WaveformIterator<'a, T: NumCast + Bounded> {
+pub struct WaveformIterator<'a, T: SampleType> {
     inner: &'a Waveform<T>,
     time: f64,
 }
 
-impl<'a, T: NumCast + Bounded> WaveformIterator<'a, T> {
+impl<'a, T: SampleType> WaveformIterator<'a, T> {
     fn into_target_type_sanitized(sample: f64) -> Option<T> {
         let result = NumCast::from(sample);
 
@@ -177,7 +186,7 @@ impl<'a, T: NumCast + Bounded> WaveformIterator<'a, T> {
     }
 }
 
-impl<'a, T: NumCast + Bounded> Iterator for WaveformIterator<'a, T> {
+impl<'a, T: SampleType> Iterator for WaveformIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
