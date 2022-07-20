@@ -6,7 +6,7 @@ use num_traits::{Bounded, NumCast};
 
 use crate::PeriodicFunction;
 
-/// Helper trait defining all the types that cna be used as [Waveform]'s sample type.
+/// Helper trait defining all the types that can be used as [Waveform]'s sample type.
 pub trait SampleType: NumCast + Bounded {}
 
 impl<T> SampleType for T where T: NumCast + Bounded {}
