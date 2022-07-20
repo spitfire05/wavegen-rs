@@ -12,7 +12,7 @@
 //!     vec![sine!(50, 10), sawtooth!(20), dc_bias!(-5)]
 //! );
 //!
-//! // Use Waveform as (almost) infinite iterator:
+//! // Use Waveform as an infinite iterator:
 //! let two_seconds_of_samples: Vec<f32> = wf.iter().take(400).collect();
 //! ```
 //!
@@ -49,6 +49,31 @@
 //! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(|x| x % 2 as f64)]);
 //! ```
 //!
+//! # Overflows
+//!
+//! As [Waveform] can be composed of multiple components, it is possible for it to overflow during samples collection.
+//! If overflow occurs, the sample's value will be clamped to the largest possible representation of sample's type.
+//!
+//! That means `+/- Inf` for floating point types, and `MAX/MIN` for integers.
+//!
+//! ```
+//! use wavegen::{Waveform, dc_bias};
+//!
+//! let wf = Waveform::<f64>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]);
+//! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
+//!
+//! assert_eq!(sample, f64::INFINITY);
+//! ```
+//!
+//! ```
+//! use wavegen::{Waveform, dc_bias};
+//!
+//! let wf = Waveform::<i32>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]);
+//! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
+//!
+//! assert_eq!(sample, i32::MAX);
+//! ```
+//!
 //! # Note about Nyquist-Shannon rule enforcement
 //!
 //! As a rule of thumb in signal processing, the sampling frequency should be *at least* 2 times bigger than the highest frequency of sampled continous signal.
@@ -82,6 +107,7 @@ mod waveform;
 
 use alloc::boxed::Box;
 
+pub use waveform::SampleType;
 pub use waveform::Waveform;
 
 /// Type alias defining a periodic function (f64 -> f64 map)
