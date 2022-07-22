@@ -74,6 +74,30 @@
 //! assert_eq!(sample, i32::MAX);
 //! ```
 //!
+//! # Iterator panics
+//!
+//! The `WaveformIterator::next()` method can panic in some rare cases if it is not able to convert the inner sample type `f64` into the target sample type.
+//!
+//! ```should_panic
+//! use wavegen::{Waveform, dc_bias};
+//!
+//! let wf = Waveform::<i32>::with_components(100.0, vec![dc_bias![f64::NAN]]);
+//!
+//! // 'f64::NAN` can't be converted into `i32`, code below will panic
+//! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
+//! ```
+//!
+//! ```
+//! use wavegen::{Waveform, dc_bias};
+//!
+//! let wf = Waveform::<f32>::with_components(100.0, vec![dc_bias![f64::NAN]]);
+//!
+//! // This however is fine, as `f64::NAN` can be represented as `f32::NAN`
+//! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
+//! ```
+//!
+//! It is probably a good practice to sanitize the parameters of the periodic function before it is constructed.
+//!
 //! # Note about Nyquist-Shannon rule enforcement
 //!
 //! As a rule of thumb in signal processing, the sampling frequency should be *at least* 2 times bigger than the highest frequency of sampled continous signal.
