@@ -94,7 +94,6 @@
 //! 
 //! // This however is fine, as `f64::NAN` can be represented as `f32::NAN`
 //! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
-//! assert_eq!(sample, f32::NAN);
 //! ```
 //! 
 //! It is probably a good practice to sanitize the parameters of the periodic function before it is constructed.
