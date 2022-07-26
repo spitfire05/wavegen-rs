@@ -14,7 +14,7 @@
 [dependencies]
 wavegen = "0.2"
 ```
-Or, to use the *no_std* version:
+Or, to use the *no_std* version (custom global allocator is required):
 
 ```toml
 [dependencies]
