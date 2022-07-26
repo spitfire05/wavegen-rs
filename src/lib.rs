@@ -1,4 +1,4 @@
-//! Rust waveform generator, with no_std support.
+//! Rust waveform generator, with [no_std support](https://github.com/spitfire05/wavegen-rs#how-to-use-it).
 //!
 //! # Quickstart
 //!
