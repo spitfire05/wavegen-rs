@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use alloc::{boxed::Box, vec, vec::Vec};
+use alloc::{vec, vec::Vec};
 
 use num_traits::{Bounded, NumCast};
 
@@ -12,9 +12,10 @@ pub trait SampleType: NumCast + Bounded {}
 impl<T> SampleType for T where T: NumCast + Bounded {}
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
+#[derive(Debug, Clone)]
 pub struct Waveform<T: SampleType> {
     sample_rate: f64,
-    components: Vec<Box<dyn PeriodicFunction>>,
+    components: Vec<PeriodicFunction>,
     _phantom: PhantomData<T>,
 }
 
@@ -57,7 +58,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: f64, components: Vec<Box<dyn PeriodicFunction>>) -> Self {
+    pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
         Self::assert_sane(sample_rate);
 
         Waveform {
@@ -80,7 +81,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
-    pub fn add_component(&mut self, component: Box<dyn PeriodicFunction>) {
+    pub fn add_component(&mut self, component: PeriodicFunction) {
         self.components.push(component);
     }
 

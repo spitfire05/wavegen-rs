@@ -41,22 +41,12 @@
 //! Refer to Macros section for more info.
 //!
 //! # Custom periodic functions
-//! Supported, of course. Just implement `PeriodicFunction` for your struct and use it with [Waveform].
+//! Supported, of course. Just use [PeriodicFunction::custom] with [Waveform].
 //!
 //! ```
 //! use wavegen::{Waveform, PeriodicFunction};
 //!
-//! struct MyPeriodicFunction {
-//!     modulo: u16
-//! }
-//!
-//! impl PeriodicFunction for MyPeriodicFunction {
-//!     fn sample(&self, t: f64) -> f64 {
-//!         t % self.modulo as f64
-//!     }
-//! }
-//!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(MyPeriodicFunction {modulo: 2})]);
+//! let wf = Waveform::<f64>::with_components(100.0, vec![PeriodicFunction::custom(|t| t % 2.0)]);
 //! ```
 //!
 //! # Overflows
