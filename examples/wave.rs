@@ -1,5 +1,5 @@
 /* Use Wavegen + Hound to generate a WAVE audio file */
-use wavegen::{dc_bias, sine, Waveform};
+use wavegen::{sine, Waveform};
 
 const SAMPLE_RATE: u16 = 44100; // sample rate
 const FILENAME: &str = "sine.wav"; // output file name
@@ -7,11 +7,8 @@ const WAVE_TIME_S: f32 = 1.0; // audio length in seconds
 
 fn main() {
     // Define waveform
-    // 500 Hz sine spanned from 0 to i16::MAX
-    let wf = Waveform::<i16>::with_components(
-        SAMPLE_RATE as f64,
-        vec![sine!(500, i16::MAX / 2), dc_bias!(i16::MAX / 2)],
-    );
+    // 500 Hz sine spanned from i16::MIN to i16::MAX
+    let wf = Waveform::<i16>::with_components(SAMPLE_RATE as f64, vec![sine!(500, i16::MAX)]);
 
     // WAVE file specification
     let spec = hound::WavSpec {
