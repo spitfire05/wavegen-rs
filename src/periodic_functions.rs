@@ -49,7 +49,7 @@ fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
     sin((2.0 * PI * pfdfrequency * t) + (pfdphase * 2.0 * PI)) * pfd.amplitude
 }
 
-/// Data struct for [PeriodicFunction]. You probably don't need to use this directly.
+/// Data struct for [PeriodicFunction].
 #[derive(Debug, Clone, Copy)]
 pub struct PeriodicFunctionData {
     frequency: f64,
