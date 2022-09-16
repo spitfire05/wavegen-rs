@@ -34,7 +34,7 @@ fn sawtooth(pfd: &PeriodicFunctionData, t: f64) -> f64 {
 }
 
 #[cfg(all(not(feature = "libm"), feature = "std"))]
-pub fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
+fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
     use core::f64::consts::PI;
 
     let radians = (2.0 * PI * pfd.frequency * t) + (pfd.phase * 2.0 * PI);
@@ -44,11 +44,12 @@ pub fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
 }
 
 #[cfg(feature = "libm")]
-pub fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
+fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
     use libm::sin;
     sin((2.0 * PI * pfdfrequency * t) + (pfdphase * 2.0 * PI)) * pfd.amplitude
 }
 
+/// Data struct for [PeriodicFunction]. You probably don't need to use this directly.
 #[derive(Debug, Clone, Copy)]
 pub struct PeriodicFunctionData {
     frequency: f64,
@@ -57,6 +58,8 @@ pub struct PeriodicFunctionData {
 }
 
 impl PeriodicFunctionData {
+    /// Creates new instance of [PeriodicFunctionData].
+    /// You probably don't need to use this, see the macros section instead.
     pub fn new(frequency: f64, amplitude: f64, phase: f64) -> Self {
         Self {
             frequency,
@@ -66,16 +69,27 @@ impl PeriodicFunctionData {
     }
 }
 
+/// Defines a periodic function to use with [crate::Waveform].
 #[derive(Clone)]
 pub enum PeriodicFunction {
+    /// Sine wave
     Sine(PeriodicFunctionData),
+
+    /// Square wave
     Square(PeriodicFunctionData),
+
+    /// Sawtooth wave
     Sawtooth(PeriodicFunctionData),
+
+    /// DC bias
     Bias(f64),
+
+    /// Custom function
     Custom(Rc<dyn Fn(f64) -> f64>),
 }
 
 impl PeriodicFunction {
+    /// Returns the sample value at point `t`
     pub fn sample(&self, t: f64) -> f64 {
         match self {
             PeriodicFunction::Sine(pfd) => sine(pfd, t),
@@ -86,6 +100,14 @@ impl PeriodicFunction {
         }
     }
 
+    /// Returns a custom periodic function, defined by `f`
+    ///
+    /// # Examples
+    /// ```
+    /// use wavegen::PeriodicFunction;
+    ///
+    /// let f = PeriodicFunction::custom(|t| t % 2.0);
+    /// ```
     pub fn custom<T: Fn(f64) -> f64 + 'static>(f: T) -> Self {
         Self::Custom(Rc::new(f))
     }
@@ -120,7 +142,7 @@ impl std::fmt::Debug for PeriodicFunction {
 #[macro_export]
 macro_rules! dc_bias {
     ($bias:expr) => {
-        $crate::periodic_functions::PeriodicFunction::Bias($bias as f64)
+        $crate::PeriodicFunction::Bias($bias as f64)
     };
 }
 
@@ -151,13 +173,11 @@ macro_rules! sawtooth {
         sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::PeriodicFunction::Sawtooth(
-            $crate::periodic_functions::PeriodicFunctionData::new(
-                $frequency as f64,
-                $amplitude as f64,
-                $phase as f64,
-            ),
-        )
+        $crate::PeriodicFunction::Sawtooth($crate::PeriodicFunctionData::new(
+            $frequency as f64,
+            $amplitude as f64,
+            $phase as f64,
+        ))
     };
 }
 
@@ -212,13 +232,11 @@ macro_rules! sine {
         sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::PeriodicFunction::Sine(
-            $crate::periodic_functions::PeriodicFunctionData::new(
-                $frequency as f64,
-                $amplitude as f64,
-                $phase as f64,
-            ),
-        )
+        $crate::PeriodicFunction::Sine($crate::PeriodicFunctionData::new(
+            $frequency as f64,
+            $amplitude as f64,
+            $phase as f64,
+        ))
     };
 }
 
@@ -249,13 +267,11 @@ macro_rules! square {
         square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::PeriodicFunction::Square(
-            $crate::periodic_functions::PeriodicFunctionData::new(
-                $frequency as f64,
-                $amplitude as f64,
-                $phase as f64,
-            ),
-        )
+        $crate::PeriodicFunction::Square($crate::PeriodicFunctionData::new(
+            $frequency as f64,
+            $amplitude as f64,
+            $phase as f64,
+        ))
     };
 }
 

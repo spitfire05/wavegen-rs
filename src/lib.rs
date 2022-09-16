@@ -124,11 +124,11 @@ compile_error!("at least one of \"libm\", \"std\" features has to be enabled");
 
 extern crate alloc;
 
-#[doc(hidden)]
-pub mod periodic_functions;
+mod periodic_functions;
 
 mod waveform;
 
 pub use periodic_functions::PeriodicFunction;
+pub use periodic_functions::PeriodicFunctionData;
 pub use waveform::SampleType;
 pub use waveform::Waveform;
