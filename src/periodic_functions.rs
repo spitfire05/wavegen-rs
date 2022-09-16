@@ -1,5 +1,7 @@
 use core::f64::consts::PI;
 
+use getset::Getters;
+
 #[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {
     // this is actually slower than `x - ((x as i64) as f64)` on x86_64-pc-windows-msvc target,
@@ -48,10 +50,18 @@ fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
 }
 
 /// Data struct for [PeriodicFunction].
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Getters)]
 pub struct PeriodicFunctionData {
+    /// Frequency in `Hz`.
+    #[getset(get = "pub")]
     frequency: f64,
+
+    /// Amplitude in 0-peak notation.
+    #[getset(get = "pub")]
     amplitude: f64,
+
+    /// The phase shift of the function. Value of 1 means full shift around.
+    #[getset(get = "pub")]
     phase: f64,
 }
 
