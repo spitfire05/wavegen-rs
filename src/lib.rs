@@ -41,7 +41,7 @@
 //! Refer to Macros section for more info.
 //!
 //! # Custom periodic functions
-//! Supported, of course. Just use [PeriodicFunction::custom] with [Waveform].
+//! Supported, of course. Just use [PeriodicFunction::Custom] with [Waveform].
 //!
 //! ```
 //! use wavegen::{Waveform, PeriodicFunction};
@@ -128,6 +128,7 @@ mod periodic_functions;
 
 mod waveform;
 
+pub use periodic_functions::CustomFunction;
 pub use periodic_functions::PeriodicFunction;
 pub use periodic_functions::PeriodicFunctionData;
 pub use waveform::SampleType;

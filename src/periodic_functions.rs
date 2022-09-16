@@ -76,6 +76,8 @@ impl PeriodicFunctionData {
     }
 }
 
+/// Trait defining a thread-safe custom function.
+/// See [PeriodicFunction::Custom].
 pub trait CustomFunction: Fn(f64) -> f64 + Send + Sync {}
 
 impl<T: Fn(f64) -> f64 + Send + Sync> CustomFunction for T {}
@@ -278,16 +280,29 @@ macro_rules! square {
 mod tests {
     use super::frac;
     use float_cmp::approx_eq;
+    use quickcheck::TestResult;
+    use quickcheck_macros::quickcheck;
 
     const EPS: f64 = 1e-3;
 
-    #[test]
-    fn dc_bias_is_const_for_any_input() {
-        let y = 42.0;
-        let dc = dc_bias!(y);
-        for x in (0..10000000).map(|x| x as f64) {
-            assert_eq!(dc.sample(x), y);
+    #[quickcheck]
+    fn dc_bias_is_const_for_any_input(y: f64) -> TestResult {
+        if y.is_nan() {
+            return TestResult::discard();
         }
+        let dc = dc_bias!(y);
+
+        TestResult::from_bool((0..10000000).map(|x| x as f64).all(|x| dc.sample(x) == y))
+    }
+
+    #[quickcheck]
+    fn frac_is_less_than_one(x: f64) -> TestResult {
+        if x.is_infinite() || x.is_nan() {
+            return TestResult::discard();
+        }
+        let value = frac(x).abs();
+
+        TestResult::from_bool(value < 1.0)
     }
 
     #[test]
