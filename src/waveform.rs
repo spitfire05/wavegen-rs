@@ -2,6 +2,7 @@ use core::marker::PhantomData;
 
 use alloc::{vec, vec::Vec};
 
+use getset::Getters;
 use num_traits::{Bounded, NumCast};
 
 use crate::PeriodicFunction;
@@ -12,10 +13,16 @@ pub trait SampleType: NumCast + Bounded {}
 impl<T> SampleType for T where T: NumCast + Bounded {}
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Getters)]
 pub struct Waveform<T: SampleType> {
+    /// Sample rate of this Waveform
+    #[getset(get = "pub")]
     sample_rate: f64,
+
+    /// The list of [PeriodicFunction]s this Waveform consists of
+    #[getset(get = "pub")]
     components: Vec<PeriodicFunction>,
+
     _phantom: PhantomData<T>,
 }
 
@@ -79,40 +86,10 @@ impl<T: SampleType> Waveform<T> {
     /// wf.add_component(sine!(10));
     /// wf.add_component(dc_bias!(5));
     ///
-    /// assert_eq!(2, wf.get_components_len());
+    /// assert_eq!(2, wf.components().len());
     /// ```
     pub fn add_component(&mut self, component: PeriodicFunction) {
         self.components.push(component);
-    }
-
-    /// Getter for sample rate of a [Waveform].
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use wavegen::Waveform;
-    ///
-    /// let wf = Waveform::<f32>::new(42.0);
-    ///
-    /// assert_eq!(42.0, wf.get_sample_rate());
-    /// ```
-    pub fn get_sample_rate(&self) -> f64 {
-        self.sample_rate
-    }
-
-    /// Returns number of components this [Waveform] consists of.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use wavegen::{Waveform, sine, dc_bias};
-    ///
-    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1), dc_bias!(5)]);
-    ///
-    /// assert_eq!(2, wf.get_components_len());
-    /// ```
-    pub fn get_components_len(&self) -> usize {
-        self.components.len()
     }
 
     /// Returns an iterator over this [Waveform] samples.
