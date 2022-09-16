@@ -66,6 +66,10 @@ impl PeriodicFunctionData {
     }
 }
 
+pub trait CustomFunction: Fn(f64) -> f64 + Send + Sync {}
+
+impl<T: Fn(f64) -> f64 + Send + Sync> CustomFunction for T {}
+
 /// Defines a periodic function to use with [crate::Waveform].
 #[derive(Clone)]
 pub enum PeriodicFunction {
@@ -82,7 +86,7 @@ pub enum PeriodicFunction {
     Bias(f64),
 
     /// Custom function
-    Custom(&'static dyn Fn(f64) -> f64),
+    Custom(&'static dyn CustomFunction),
 }
 
 impl PeriodicFunction {
