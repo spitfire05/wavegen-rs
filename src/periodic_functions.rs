@@ -1,4 +1,5 @@
 use alloc::rc::Rc;
+use core::f64::consts::PI;
 
 #[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {
@@ -35,8 +36,6 @@ fn sawtooth(pfd: &PeriodicFunctionData, t: f64) -> f64 {
 
 #[cfg(all(not(feature = "libm"), feature = "std"))]
 fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
-    use core::f64::consts::PI;
-
     let radians = (2.0 * PI * pfd.frequency * t) + (pfd.phase * 2.0 * PI);
     let sine = radians.sin();
 
@@ -46,7 +45,7 @@ fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
 #[cfg(feature = "libm")]
 fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
     use libm::sin;
-    sin((2.0 * PI * pfdfrequency * t) + (pfdphase * 2.0 * PI)) * pfd.amplitude
+    sin((2.0 * PI * pfd.frequency * t) + (pfd.phase * 2.0 * PI)) * pfd.amplitude
 }
 
 /// Data struct for [PeriodicFunction].
@@ -112,7 +111,7 @@ impl PeriodicFunction {
     }
 }
 
-impl std::fmt::Debug for PeriodicFunction {
+impl core::fmt::Debug for PeriodicFunction {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Sine(arg0) => f.debug_tuple("Sine").field(arg0).finish(),
