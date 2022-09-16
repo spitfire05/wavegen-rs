@@ -340,7 +340,7 @@ mod tests {
             let wf = Waveform::<f32>::new(44100.0);
             assert_eq!((usize::MAX, None), wf.iter().size_hint());
         };
-        ($($component:expr,)*) => {
+        ($($component:expr),*) => {
             let mut wf = Waveform::<f32>::new(44100.0);
             $(
                 wf.add_component($component);
@@ -352,8 +352,8 @@ mod tests {
     #[test]
     fn test_size_hint() {
         test_size_hint!();
-        test_size_hint!(sine!(50),);
-        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4),);
+        test_size_hint!(sine!(50));
+        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4));
     }
 
     #[test]
