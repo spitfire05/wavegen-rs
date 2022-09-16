@@ -46,7 +46,7 @@
 //! ```
 //! use wavegen::{Waveform, PeriodicFunction};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![PeriodicFunction::custom(|t| t % 2.0)]);
+//! let wf = Waveform::<f64>::with_components(100.0, vec![PeriodicFunction::custom(&|t| t % 2.0)]);
 //! ```
 //!
 //! # Overflows

@@ -1,4 +1,3 @@
-use alloc::rc::Rc;
 use core::f64::consts::PI;
 
 #[cfg(feature = "std")]
@@ -83,7 +82,7 @@ pub enum PeriodicFunction {
     Bias(f64),
 
     /// Custom function
-    Custom(Rc<dyn Fn(f64) -> f64>),
+    Custom(&'static dyn Fn(f64) -> f64),
 }
 
 impl PeriodicFunction {
@@ -104,10 +103,10 @@ impl PeriodicFunction {
     /// ```
     /// use wavegen::PeriodicFunction;
     ///
-    /// let f = PeriodicFunction::custom(|t| t % 2.0);
+    /// let f = PeriodicFunction::custom(&|t| t % 2.0);
     /// ```
-    pub fn custom<T: Fn(f64) -> f64 + 'static>(f: T) -> Self {
-        Self::Custom(Rc::new(f))
+    pub fn custom<T: Fn(f64) -> f64>(f: &'static T) -> Self {
+        Self::Custom(f)
     }
 }
 
