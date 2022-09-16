@@ -96,18 +96,6 @@ impl PeriodicFunction {
             PeriodicFunction::Custom(f) => f(t),
         }
     }
-
-    /// Returns a custom periodic function, defined by `f`
-    ///
-    /// # Examples
-    /// ```
-    /// use wavegen::PeriodicFunction;
-    ///
-    /// let f = PeriodicFunction::custom(&|t| t % 2.0);
-    /// ```
-    pub fn custom<T: Fn(f64) -> f64>(f: &'static T) -> Self {
-        Self::Custom(f)
-    }
 }
 
 impl core::fmt::Debug for PeriodicFunction {
