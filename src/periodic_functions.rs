@@ -59,7 +59,6 @@ pub struct PeriodicFunctionData {
 
 impl PeriodicFunctionData {
     /// Creates new instance of [PeriodicFunctionData].
-    /// You probably don't need to use this, see the macros section instead.
     pub fn new(frequency: f64, amplitude: f64, phase: f64) -> Self {
         Self {
             frequency,

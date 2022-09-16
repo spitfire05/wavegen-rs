@@ -278,6 +278,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::iter_skip_next)]
     fn waveform_iterator_is_infinite() {
         let wf = Waveform::<f64>::new(f64::MIN_POSITIVE);
         let mut iter = wf.iter().skip(usize::MAX);
@@ -356,6 +357,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::iter_nth_zero)]
     fn nth_and_next_give_same_results() {
         let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
         let mut i1 = wf.iter();
