@@ -41,12 +41,22 @@
 //! Refer to Macros section for more info.
 //!
 //! # Custom periodic functions
-//! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
+//! Supported, of course. Just implement `PeriodicFunction` for your struct and use it with [Waveform].
 //!
 //! ```
-//! use wavegen::Waveform;
+//! use wavegen::{Waveform, PeriodicFunction};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(|x| x % 2 as f64)]);
+//! struct MyPeriodicFunction {
+//!     modulo: u16
+//! }
+//!
+//! impl PeriodicFunction for MyPeriodicFunction {
+//!     fn sample(&self, t: f64) -> f64 {
+//!         t % self.modulo as f64
+//!     }
+//! }
+//!
+//! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(MyPeriodicFunction {modulo: 2})]);
 //! ```
 //!
 //! # Overflows
@@ -129,10 +139,6 @@ pub mod periodic_functions;
 
 mod waveform;
 
-use alloc::boxed::Box;
-
+pub use periodic_functions::PeriodicFunction;
 pub use waveform::SampleType;
 pub use waveform::Waveform;
-
-/// Type alias defining a periodic function (f64 -> f64 map)
-pub type PeriodicFunction = Box<dyn Fn(f64) -> f64 + Send + Sync>;

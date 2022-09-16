@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use alloc::{vec, vec::Vec};
+use alloc::{boxed::Box, vec, vec::Vec};
 
 use num_traits::{Bounded, NumCast};
 
@@ -14,7 +14,7 @@ impl<T> SampleType for T where T: NumCast + Bounded {}
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
 pub struct Waveform<T: SampleType> {
     sample_rate: f64,
-    components: Vec<PeriodicFunction>,
+    components: Vec<Box<dyn PeriodicFunction>>,
     _phantom: PhantomData<T>,
 }
 
@@ -57,7 +57,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
+    pub fn with_components(sample_rate: f64, components: Vec<Box<dyn PeriodicFunction>>) -> Self {
         Self::assert_sane(sample_rate);
 
         Waveform {
@@ -80,7 +80,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
-    pub fn add_component(&mut self, component: PeriodicFunction) {
+    pub fn add_component(&mut self, component: Box<dyn PeriodicFunction>) {
         self.components.push(component);
     }
 
@@ -182,7 +182,11 @@ impl<'a, T: SampleType> WaveformIterator<'a, T> {
     }
 
     fn raw_sample(&self) -> f64 {
-        self.inner.components.iter().map(|x| x(self.time)).sum()
+        self.inner
+            .components
+            .iter()
+            .map(|x| x.sample(self.time))
+            .sum()
     }
 }
 
@@ -214,8 +218,8 @@ mod tests {
     use float_cmp::approx_eq;
     use paste::paste;
 
-    use super::Waveform;
-    use crate::{dc_bias, sawtooth, sine, square};
+    // use super::Waveform;
+    use crate::{dc_bias, sawtooth, sine, square, Waveform};
 
     const EPS: f32 = 1e-3;
 

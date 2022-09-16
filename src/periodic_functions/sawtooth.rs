@@ -17,8 +17,27 @@ fn frac(x: f64) -> f64 {
     frac
 }
 
-pub fn _sawtooth(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
-    Box::new(move |t| 2.0 * amplitude * frac(t * frequency + phase) - amplitude)
+#[derive(Debug, Clone, Copy)]
+pub struct Sawtooth {
+    frequency: f64,
+    amplitude: f64,
+    phase: f64,
+}
+
+impl Sawtooth {
+    pub fn new(frequency: f64, amplitude: f64, phase: f64) -> Box<Self> {
+        Box::new(Sawtooth {
+            frequency,
+            amplitude,
+            phase,
+        })
+    }
+}
+
+impl PeriodicFunction for Sawtooth {
+    fn sample(&self, t: f64) -> f64 {
+        2.0 * self.amplitude * frac(t * self.frequency + self.phase) - self.amplitude
+    }
 }
 
 /// Builder macro for Sine [PeriodicFunction].
@@ -48,7 +67,7 @@ macro_rules! sawtooth {
         sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sawtooth::_sawtooth(
+        $crate::periodic_functions::sawtooth::Sawtooth::new(
             $frequency as f64,
             $amplitude as f64,
             $phase as f64,
@@ -59,6 +78,8 @@ macro_rules! sawtooth {
 #[cfg(test)]
 mod tests {
     use float_cmp::approx_eq;
+
+    use crate::PeriodicFunction;
 
     use super::frac;
 
@@ -76,7 +97,7 @@ mod tests {
     fn default_sawtooth_has_amplitude_of_one() {
         let f = sawtooth!(2.0);
 
-        assert!(approx_eq!(f64, f(0.49999), 1.0, epsilon = EPS));
-        assert!(approx_eq!(f64, f(0.5), -1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, f.sample(0.49999), 1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, f.sample(0.5), -1.0, epsilon = EPS));
     }
 }

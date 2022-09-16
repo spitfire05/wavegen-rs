@@ -2,22 +2,39 @@ use core::f64::consts::PI;
 
 use alloc::boxed::Box;
 
-use crate::PeriodicFunction;
+use crate::periodic_functions::PeriodicFunction;
 
-#[cfg(all(not(feature = "libm"), feature = "std"))]
-pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
-    Box::new(move |t| {
-        let radians = (2.0 * PI * frequency * t) + (phase * 2.0 * PI);
-        let sine = radians.sin();
-
-        sine * amplitude
-    })
+#[derive(Debug, Clone, Copy)]
+pub struct Sine {
+    frequency: f64,
+    amplitude: f64,
+    phase: f64,
 }
 
-#[cfg(feature = "libm")]
-pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
-    use libm::sin;
-    Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
+impl Sine {
+    pub fn new(frequency: f64, amplitude: f64, phase: f64) -> Box<Self> {
+        Box::new(Sine {
+            frequency,
+            amplitude,
+            phase,
+        })
+    }
+}
+
+impl PeriodicFunction for Sine {
+    #[cfg(all(not(feature = "libm"), feature = "std"))]
+    fn sample(&self, t: f64) -> f64 {
+        let radians = (2.0 * PI * self.frequency * t) + (self.phase * 2.0 * PI);
+        let sine = radians.sin();
+
+        sine * self.amplitude
+    }
+
+    #[cfg(feature = "libm")]
+    fn sample(&self, t: f64) -> f64 {
+        use libm::sin;
+        sin((2.0 * PI * self.frequency * t) + (self.phase * 2.0 * PI)) * self.amplitude
+    }
 }
 
 /// Builder macro for Sine [PeriodicFunction].
@@ -71,7 +88,11 @@ macro_rules! sine {
         sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sine::_sine($frequency as f64, $amplitude as f64, $phase as f64)
+        $crate::periodic_functions::sine::Sine::new(
+            $frequency as f64,
+            $amplitude as f64,
+            $phase as f64,
+        )
     };
 }
 
@@ -79,15 +100,17 @@ macro_rules! sine {
 mod tests {
     use float_cmp::approx_eq;
 
+    use crate::PeriodicFunction;
+
     const EPS: f64 = 1e-3;
 
     #[test]
     fn default_sine_has_amplitude_of_one_and_no_phase_shift() {
         let sine = sine!(1);
 
-        let max = sine(0.25);
-        let min = sine(0.75);
-        let zero = sine(0.5);
+        let max = sine.sample(0.25);
+        let min = sine.sample(0.75);
+        let zero = sine.sample(0.5);
 
         assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
         assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
@@ -98,9 +121,9 @@ mod tests {
     fn phase_affects_min_max_amplitude_position() {
         let sine = sine!(1, 1, 0.5);
 
-        let max = sine(0.75);
-        let min = sine(0.25);
-        let zero = sine(0.5);
+        let max = sine.sample(0.75);
+        let min = sine.sample(0.25);
+        let zero = sine.sample(0.5);
 
         assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
         assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
