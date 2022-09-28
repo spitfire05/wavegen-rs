@@ -46,7 +46,7 @@
 //! ```
 //! use wavegen::{Waveform, PeriodicFunction};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![PeriodicFunction::Custom(&|t| t % 2.0)]);
+//! let wf = Waveform::<f64>::with_components(100.0, vec![PeriodicFunction::Custom(|t| t % 2.0)]);
 //! ```
 //!
 //! # Overflows
@@ -94,6 +94,8 @@
 //!
 //! // This however is fine, as `f64::NAN` can be represented as `f32::NAN`
 //! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
+//!
+//! assert!(sample.is_nan());
 //! ```
 //!
 //! It is probably a good practice to sanitize the parameters of the periodic function before it is constructed.
@@ -128,7 +130,6 @@ mod periodic_functions;
 
 mod waveform;
 
-pub use periodic_functions::CustomFunction;
 pub use periodic_functions::PeriodicFunction;
 pub use periodic_functions::PeriodicFunctionData;
 pub use waveform::SampleType;

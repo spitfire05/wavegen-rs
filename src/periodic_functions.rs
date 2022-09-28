@@ -76,12 +76,6 @@ impl PeriodicFunctionData {
     }
 }
 
-/// Trait defining a thread-safe custom function.
-/// See [PeriodicFunction::Custom].
-pub trait CustomFunction: Fn(f64) -> f64 + Send + Sync {}
-
-impl<T: Fn(f64) -> f64 + Send + Sync> CustomFunction for T {}
-
 /// Defines a periodic function to use with [crate::Waveform].
 #[derive(Clone)]
 pub enum PeriodicFunction {
@@ -98,7 +92,7 @@ pub enum PeriodicFunction {
     Bias(f64),
 
     /// Custom function
-    Custom(&'static dyn CustomFunction),
+    Custom(fn(f64) -> f64),
 }
 
 impl PeriodicFunction {
@@ -292,7 +286,7 @@ mod tests {
         }
         let dc = dc_bias!(y);
 
-        TestResult::from_bool((0..10000000).map(|x| x as f64).all(|x| dc.sample(x) == y))
+        TestResult::from_bool((0..100_000).map(|x| x as f64).all(|x| dc.sample(x) == y))
     }
 
     #[quickcheck]
