@@ -44,9 +44,9 @@
 //! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
 //!
 //! ```
-//! use wavegen::Waveform;
+//! use wavegen::{Waveform, periodic_functions::custom};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(|x| x % 2 as f64)]);
+//! let wf = Waveform::<f64>::with_components(100.0, vec![custom(|x| x % 2.0)]);
 //! ```
 //!
 //! # Overflows
@@ -124,7 +124,7 @@ compile_error!("at least one of \"libm\", \"std\" features has to be enabled");
 
 extern crate alloc;
 
-#[doc(hidden)]
+/// foo
 pub mod periodic_functions;
 
 mod waveform;
