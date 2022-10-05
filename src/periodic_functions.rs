@@ -27,10 +27,10 @@ pub fn square(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) ->
 }
 
 #[cfg(feature = "libm")]
-fn square(pfd: &PeriodicFunctionData, t: f64) -> f64 {
+pub fn square(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) -> f64> {
     // TODO: implement duty cycle control
     use libm::{floor, pow};
-    pfd.amplitude * pow(-1.0, floor(2.0 * (t - pfd.phase) * pfd.frequency))
+    Box::new(move |t| amplitude * pow(-1.0, floor(2.0 * (t - phase) * frequency)))
 }
 
 pub fn sawtooth(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) -> f64> {
@@ -48,9 +48,9 @@ pub fn sine(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) -> f
 }
 
 #[cfg(feature = "libm")]
-fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
+pub fn sine(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) -> f64> {
     use libm::sin;
-    sin((2.0 * PI * pfd.frequency * t) + (pfd.phase * 2.0 * PI)) * pfd.amplitude
+    Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
 }
 
 pub fn bias(bias: f64) -> Box<impl Fn(f64) -> f64> {
