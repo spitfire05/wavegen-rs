@@ -185,13 +185,10 @@ impl<'a, T: SampleType> Iterator for WaveformIterator<'a, T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::{dc_bias, sawtooth, sine, square, Waveform};
     use alloc::{vec, vec::Vec};
-
     use float_cmp::approx_eq;
     use paste::paste;
-
-    // use super::Waveform;
-    use crate::{dc_bias, sawtooth, sine, square, Waveform};
 
     const EPS: f32 = 1e-3;
 
