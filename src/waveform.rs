@@ -1,7 +1,5 @@
+use alloc::{boxed::Box, vec, vec::Vec};
 use core::marker::PhantomData;
-
-use alloc::{vec, vec::Vec};
-
 use getset::Getters;
 use num_traits::{Bounded, NumCast};
 
@@ -13,7 +11,7 @@ pub trait SampleType: NumCast + Bounded {}
 impl<T> SampleType for T where T: NumCast + Bounded {}
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
-#[derive(Debug, Clone, Getters)]
+#[derive(Getters)]
 pub struct Waveform<T: SampleType> {
     /// Sample rate of this Waveform
     #[getset(get = "pub")]
@@ -21,7 +19,7 @@ pub struct Waveform<T: SampleType> {
 
     /// The list of [PeriodicFunction]s this Waveform consists of
     #[getset(get = "pub")]
-    components: Vec<PeriodicFunction>,
+    components: Vec<Box<PeriodicFunction>>,
 
     _phantom: PhantomData<T>,
 }
@@ -65,7 +63,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
+    pub fn with_components(sample_rate: f64, components: Vec<Box<PeriodicFunction>>) -> Self {
         Self::assert_sane(sample_rate);
 
         Waveform {
@@ -88,7 +86,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// assert_eq!(2, wf.components().len());
     /// ```
-    pub fn add_component(&mut self, component: PeriodicFunction) {
+    pub fn add_component(&mut self, component: Box<PeriodicFunction>) {
         self.components.push(component);
     }
 
@@ -160,11 +158,7 @@ impl<'a, T: SampleType> WaveformIterator<'a, T> {
     }
 
     fn raw_sample(&self) -> f64 {
-        self.inner
-            .components
-            .iter()
-            .map(|x| x.sample(self.time))
-            .sum()
+        self.inner.components.iter().map(|x| x(self.time)).sum()
     }
 }
 

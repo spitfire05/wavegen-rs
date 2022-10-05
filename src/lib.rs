@@ -41,12 +41,13 @@
 //! Refer to Macros section for more info.
 //!
 //! # Custom periodic functions
-//! Supported, of course. Just use [PeriodicFunction::Custom] with [Waveform].
+//! Supported, of course. Define your custom function as `Box<Fn(f64) -> f64>`
+//! and use it with [Waveform].
 //!
 //! ```
-//! use wavegen::{Waveform, PeriodicFunction};
+//! use wavegen::{Waveform};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![PeriodicFunction::Custom(|t| t % 2.0)]);
+//! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(|t| t % 2.0)]);
 //! ```
 //!
 //! # Overflows
@@ -126,11 +127,13 @@ compile_error!("at least one of \"libm\", \"std\" features has to be enabled");
 
 extern crate alloc;
 
-mod periodic_functions;
+#[doc(hidden)]
+pub mod periodic_functions;
 
 mod waveform;
 
-pub use periodic_functions::PeriodicFunction;
-pub use periodic_functions::PeriodicFunctionData;
 pub use waveform::SampleType;
 pub use waveform::Waveform;
+
+/// Type alias defining a periodic function (f64 -> f64 map)
+pub type PeriodicFunction = dyn Fn(f64) -> f64 + Send + Sync;

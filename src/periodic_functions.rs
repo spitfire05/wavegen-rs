@@ -1,6 +1,5 @@
+use alloc::boxed::Box;
 use core::f64::consts::PI;
-
-use getset::Getters;
 
 #[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {
@@ -18,10 +17,13 @@ fn frac(x: f64) -> f64 {
 }
 
 #[cfg(all(not(feature = "libm"), feature = "std"))]
-fn square(pfd: &PeriodicFunctionData, t: f64) -> f64 {
-    let power = (2.0 * (t - pfd.phase) * pfd.frequency).floor() as i32;
+pub fn square(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) -> f64> {
+    Box::new(move |t| {
+        let x: f64 = 2.0 * (t - phase) * frequency;
+        let power: i32 = x.floor() as i32;
 
-    pfd.amplitude * (-1f64).powi(power)
+        amplitude * (-1f64).powi(power)
+    })
 }
 
 #[cfg(feature = "libm")]
@@ -31,16 +33,18 @@ fn square(pfd: &PeriodicFunctionData, t: f64) -> f64 {
     pfd.amplitude * pow(-1.0, floor(2.0 * (t - pfd.phase) * pfd.frequency))
 }
 
-fn sawtooth(pfd: &PeriodicFunctionData, t: f64) -> f64 {
-    2.0 * pfd.amplitude * frac(t * pfd.frequency + pfd.phase) - pfd.amplitude
+pub fn sawtooth(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) -> f64> {
+    Box::new(move |t| 2.0 * amplitude * frac(t * frequency + phase) - amplitude)
 }
 
 #[cfg(all(not(feature = "libm"), feature = "std"))]
-fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
-    let radians = (2.0 * PI * pfd.frequency * t) + (pfd.phase * 2.0 * PI);
-    let sine = radians.sin();
+pub fn sine(frequency: f64, amplitude: f64, phase: f64) -> Box<impl Fn(f64) -> f64> {
+    Box::new(move |t| {
+        let radians: f64 = (2.0 * PI * frequency * t) + (phase * 2.0 * PI);
+        let sine = radians.sin();
 
-    sine * pfd.amplitude
+        sine * amplitude
+    })
 }
 
 #[cfg(feature = "libm")]
@@ -49,75 +53,8 @@ fn sine(pfd: &PeriodicFunctionData, t: f64) -> f64 {
     sin((2.0 * PI * pfd.frequency * t) + (pfd.phase * 2.0 * PI)) * pfd.amplitude
 }
 
-/// Data struct for [PeriodicFunction].
-#[derive(Debug, Clone, Copy, Getters)]
-pub struct PeriodicFunctionData {
-    /// Frequency in `Hz`.
-    #[getset(get = "pub")]
-    frequency: f64,
-
-    /// Amplitude in 0-peak notation.
-    #[getset(get = "pub")]
-    amplitude: f64,
-
-    /// The phase shift of the function. Value of 1 means full shift around.
-    #[getset(get = "pub")]
-    phase: f64,
-}
-
-impl PeriodicFunctionData {
-    /// Creates new instance of [PeriodicFunctionData].
-    pub fn new(frequency: f64, amplitude: f64, phase: f64) -> Self {
-        Self {
-            frequency,
-            amplitude,
-            phase,
-        }
-    }
-}
-
-/// Defines a periodic function to use with [crate::Waveform].
-#[derive(Clone)]
-pub enum PeriodicFunction {
-    /// Sine wave
-    Sine(PeriodicFunctionData),
-
-    /// Square wave
-    Square(PeriodicFunctionData),
-
-    /// Sawtooth wave
-    Sawtooth(PeriodicFunctionData),
-
-    /// DC bias
-    Bias(f64),
-
-    /// Custom function
-    Custom(fn(f64) -> f64),
-}
-
-impl PeriodicFunction {
-    /// Returns the sample value at point `t`
-    pub fn sample(&self, t: f64) -> f64 {
-        match self {
-            PeriodicFunction::Sine(pfd) => sine(pfd, t),
-            PeriodicFunction::Square(pfd) => square(pfd, t),
-            PeriodicFunction::Sawtooth(pfd) => sawtooth(pfd, t),
-            PeriodicFunction::Bias(b) => *b,
-            PeriodicFunction::Custom(f) => f(t),
-        }
-    }
-}
-
-impl core::fmt::Debug for PeriodicFunction {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Sine(arg0) => f.debug_tuple("Sine").field(arg0).finish(),
-            Self::Square(arg0) => f.debug_tuple("Square").field(arg0).finish(),
-            Self::Sawtooth(arg0) => f.debug_tuple("Sawtooth").field(arg0).finish(),
-            Self::Bias(arg0) => f.debug_tuple("Bias").field(arg0).finish(),
-            Self::Custom(_) => f.debug_tuple("Custom").finish(),
-        }
-    }
+pub fn bias(bias: f64) -> Box<impl Fn(f64) -> f64> {
+    Box::new(move |_| bias)
 }
 
 /// Builder macro for DC Bias [PeriodicFunction].
@@ -132,12 +69,12 @@ impl core::fmt::Debug for PeriodicFunction {
 ///
 /// let bias = dc_bias!(10);
 ///
-/// assert!((0..100000).all(|x| bias.sample(x as f64) == 10.0))
+/// assert!((0..100000).all(|x| bias(x as f64) == 10.0))
 /// ```
 #[macro_export]
 macro_rules! dc_bias {
     ($bias:expr) => {
-        $crate::PeriodicFunction::Bias($bias as f64)
+        $crate::periodic_functions::bias($bias as f64)
     };
 }
 
@@ -168,11 +105,7 @@ macro_rules! sawtooth {
         sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::PeriodicFunction::Sawtooth($crate::PeriodicFunctionData::new(
-            $frequency as f64,
-            $amplitude as f64,
-            $phase as f64,
-        ))
+        $crate::periodic_functions::sawtooth($frequency as f64, $amplitude as f64, $phase as f64)
     };
 }
 
@@ -227,11 +160,7 @@ macro_rules! sine {
         sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::PeriodicFunction::Sine($crate::PeriodicFunctionData::new(
-            $frequency as f64,
-            $amplitude as f64,
-            $phase as f64,
-        ))
+        $crate::periodic_functions::sine($frequency as f64, $amplitude as f64, $phase as f64)
     };
 }
 
@@ -262,11 +191,7 @@ macro_rules! square {
         square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::PeriodicFunction::Square($crate::PeriodicFunctionData::new(
-            $frequency as f64,
-            $amplitude as f64,
-            $phase as f64,
-        ))
+        $crate::periodic_functions::square($frequency as f64, $amplitude as f64, $phase as f64)
     };
 }
 
@@ -286,7 +211,7 @@ mod tests {
         }
         let dc = dc_bias!(y);
 
-        TestResult::from_bool((0..100_000).map(|x| x as f64).all(|x| dc.sample(x) == y))
+        TestResult::from_bool((0..100_000).map(|x| x as f64).all(|x| dc(x) == y))
     }
 
     #[quickcheck]
@@ -311,17 +236,17 @@ mod tests {
     fn default_sawtooth_has_amplitude_of_one() {
         let f = sawtooth!(2.0);
 
-        assert!(approx_eq!(f64, f.sample(0.49999), 1.0, epsilon = EPS));
-        assert!(approx_eq!(f64, f.sample(0.5), -1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, f(0.49999), 1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, f(0.5), -1.0, epsilon = EPS));
     }
 
     #[test]
     fn default_sine_has_amplitude_of_one_and_no_phase_shift() {
         let sine = sine!(1);
 
-        let max = sine.sample(0.25);
-        let min = sine.sample(0.75);
-        let zero = sine.sample(0.5);
+        let max = sine(0.25);
+        let min = sine(0.75);
+        let zero = sine(0.5);
 
         assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
         assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
@@ -332,9 +257,9 @@ mod tests {
     fn phase_affects_min_max_amplitude_position() {
         let sine = sine!(1, 1, 0.5);
 
-        let max = sine.sample(0.75);
-        let min = sine.sample(0.25);
-        let zero = sine.sample(0.5);
+        let max = sine(0.75);
+        let min = sine(0.25);
+        let zero = sine(0.5);
 
         assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
         assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
@@ -346,11 +271,11 @@ mod tests {
         let square = square!(1);
 
         for x in [0.0, 0.1, 0.2, 0.3, 0.4] {
-            assert!(approx_eq!(f64, square.sample(x), 1.0, epsilon = EPS))
+            assert!(approx_eq!(f64, square(x), 1.0, epsilon = EPS))
         }
 
         for x in [0.5, 0.6, 0.7, 0.8, 0.9] {
-            assert!(approx_eq!(f64, square.sample(x), -1.0, epsilon = EPS))
+            assert!(approx_eq!(f64, square(x), -1.0, epsilon = EPS))
         }
     }
 }
