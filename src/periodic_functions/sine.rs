@@ -1,9 +1,11 @@
+//! Sine related functions.
+
 use crate::PeriodicFunction;
 use alloc::boxed::Box;
 use core::f64::consts::PI;
 
 #[cfg(all(not(feature = "libm"), feature = "std"))]
-pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     Box::new(move |t| {
         let radians = (2.0 * PI * frequency * t) + (phase * 2.0 * PI);
         let sine = radians.sin();
@@ -13,9 +15,16 @@ pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 }
 
 #[cfg(feature = "libm")]
-pub fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     use libm::sin;
     Box::new(move |t| sin((2.0 * PI * frequency * t) + (phase * 2.0 * PI)) * amplitude)
+}
+
+/// Sine function builder. See the [`macro`] for more info.
+///
+/// [`macro`]: ../../macro.sine.html
+pub fn sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    _sine(frequency, amplitude, phase)
 }
 
 /// Builder macro for Sine [PeriodicFunction].
@@ -69,7 +78,7 @@ macro_rules! sine {
         sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sine::_sine($frequency as f64, $amplitude as f64, $phase as f64)
+        $crate::periodic_functions::sine::sine($frequency as f64, $amplitude as f64, $phase as f64)
     };
 }
 

@@ -1,8 +1,10 @@
+//! Square related functions.
+
 use crate::PeriodicFunction;
 use alloc::boxed::Box;
 
 #[cfg(all(not(feature = "libm"), feature = "std"))]
-pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
     Box::new(move |t| {
         let power = (2.0 * (t - phase) * frequency).floor() as i32;
@@ -12,10 +14,17 @@ pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 }
 
 #[cfg(feature = "libm")]
-pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     // TODO: implement duty cycle control
     use libm::{floor, pow};
     Box::new(move |t| amplitude * pow(-1.0, floor(2.0 * (t - phase) * frequency)))
+}
+
+/// Square function builder. See the [`macro`] for more info.
+///
+/// [`macro`]: ../../macro.square.html
+pub fn square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+    _square(frequency, amplitude, phase)
 }
 
 /// Builder macro for Square [PeriodicFunction].
@@ -45,7 +54,7 @@ macro_rules! square {
         square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::square::_square(
+        $crate::periodic_functions::square::square(
             $frequency as f64,
             $amplitude as f64,
             $phase as f64,

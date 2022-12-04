@@ -1,7 +1,12 @@
+//! DC Bias related functions.
+
 use crate::PeriodicFunction;
 use alloc::boxed::Box;
 
-pub fn _dc_bias(bias: f64) -> PeriodicFunction {
+/// DC Bias function builder. See the [`macro`] for more info.
+///
+/// [`macro`]: ../../macro.dc_bias.html
+pub fn dc_bias(bias: f64) -> PeriodicFunction {
     Box::new(move |_| bias)
 }
 
@@ -22,7 +27,7 @@ pub fn _dc_bias(bias: f64) -> PeriodicFunction {
 #[macro_export]
 macro_rules! dc_bias {
     ($bias:expr) => {
-        $crate::periodic_functions::bias::_dc_bias($bias as f64)
+        $crate::periodic_functions::bias::dc_bias($bias as f64)
     };
 }
 

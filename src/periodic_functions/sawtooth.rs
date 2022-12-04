@@ -1,3 +1,5 @@
+//! Sawtooth related functions.
+
 use crate::PeriodicFunction;
 use alloc::boxed::Box;
 
@@ -16,7 +18,10 @@ fn frac(x: f64) -> f64 {
     frac
 }
 
-pub fn _sawtooth(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+/// Sawtooth function builder. See the [`macro`] for more info.
+///
+/// [`macro`]: ../../macro.sawtooth.html
+pub fn sawtooth(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     Box::new(move |t| 2.0 * amplitude * frac(t * frequency + phase) - amplitude)
 }
 
@@ -47,7 +52,7 @@ macro_rules! sawtooth {
         sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sawtooth::_sawtooth(
+        $crate::periodic_functions::sawtooth::sawtooth(
             $frequency as f64,
             $amplitude as f64,
             $phase as f64,

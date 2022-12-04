@@ -1,3 +1,5 @@
+//! Definitions of periodic functions.
+
 use crate::PeriodicFunction;
 use alloc::boxed::Box;
 
