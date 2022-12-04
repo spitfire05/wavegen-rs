@@ -166,7 +166,7 @@ impl<'a, T: SampleType> WaveformIterator<'a, T> {
             } else if sample < 0.0 {
                 Some(T::min_value())
             } else {
-                panic!("Sample {} cannot be converted to waveform type.", sample);
+                None
             }
         })
     }
