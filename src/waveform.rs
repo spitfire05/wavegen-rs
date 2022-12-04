@@ -31,7 +31,8 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
-    pub fn new(sample_rate: f64) -> Self {
+    pub fn new(sample_rate: impl Into<f64>) -> Self {
+        let sample_rate = sample_rate.into();
         Self::assert_sane(sample_rate);
 
         Waveform {
@@ -54,7 +55,8 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
+    pub fn with_components(sample_rate: impl Into<f64>, components: Vec<PeriodicFunction>) -> Self {
+        let sample_rate = sample_rate.into();
         Self::assert_sane(sample_rate);
 
         Waveform {
