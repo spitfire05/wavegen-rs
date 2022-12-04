@@ -1,6 +1,5 @@
-use alloc::boxed::Box;
-
 use crate::PeriodicFunction;
+use alloc::boxed::Box;
 
 #[cfg(all(not(feature = "libm"), feature = "std"))]
 pub fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {

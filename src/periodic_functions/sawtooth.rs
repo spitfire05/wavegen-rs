@@ -1,6 +1,5 @@
-use alloc::boxed::Box;
-
 use crate::PeriodicFunction;
+use alloc::boxed::Box;
 
 #[cfg(feature = "std")]
 fn frac(x: f64) -> f64 {

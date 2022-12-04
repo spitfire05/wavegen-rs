@@ -1,6 +1,5 @@
-use alloc::boxed::Box;
-
 use crate::PeriodicFunction;
+use alloc::boxed::Box;
 
 pub fn _dc_bias(bias: f64) -> PeriodicFunction {
     Box::new(move |_| bias)

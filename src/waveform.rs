@@ -1,10 +1,7 @@
-use core::marker::PhantomData;
-
-use alloc::{vec, vec::Vec};
-
-use num_traits::{Bounded, NumCast};
-
 use crate::PeriodicFunction;
+use alloc::{vec, vec::Vec};
+use core::marker::PhantomData;
+use num_traits::{Bounded, NumCast};
 
 /// Helper trait defining all the types that can be used as [Waveform]'s sample type.
 pub trait SampleType: NumCast + Bounded {}

@@ -1,16 +1,9 @@
 use crate::PeriodicFunction;
 use alloc::boxed::Box;
 
-#[doc(hidden)]
 pub mod bias;
-
-#[doc(hidden)]
 pub mod sawtooth;
-
-#[doc(hidden)]
 pub mod sine;
-
-#[doc(hidden)]
 pub mod square;
 
 /// Helper wrapping a custom periodic function
