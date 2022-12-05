@@ -6,7 +6,7 @@
 //! use wavegen::{Waveform, sine, dc_bias, sawtooth};
 //!
 //! // Define a Waveform with 200Hz sampling rate and three function components,
-//! // choosing f32 as the ouput type:
+//! // choosing f32 as the output type:
 //! let wf = Waveform::<f32>::with_components(
 //!     200.0,
 //!     vec![sine!(50, 10), sawtooth!(20), dc_bias!(-5)]
