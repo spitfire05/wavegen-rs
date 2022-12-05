@@ -99,14 +99,14 @@ fn draw_internal<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
     chart.configure_mesh().draw()?;
 
     chart
-        .draw_series(LineSeries::new(iter, &RED))?
+        .draw_series(LineSeries::new(iter, RED))?
         .label(label)
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
 
     chart
         .configure_series_labels()
-        .background_style(&WHITE.mix(0.8))
-        .border_style(&BLACK)
+        .background_style(WHITE.mix(0.8))
+        .border_style(BLACK)
         .draw()?;
 
     Ok(())
