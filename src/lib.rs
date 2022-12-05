@@ -3,17 +3,14 @@
 //! # Quickstart
 //!
 //! ```
-//! use wavegen::{Waveform, sine, dc_bias, sawtooth};
+//! use wavegen::{wf, sine, dc_bias, sawtooth};
 //!
 //! // Define a Waveform with 200Hz sampling rate and three function components,
 //! // choosing f32 as the output type:
-//! let wf = Waveform::<f32>::with_components(
-//!     200.0,
-//!     vec![sine!(50, 10), sawtooth!(20), dc_bias!(-5)]
-//! );
+//! let waveform = wf!(f32, 200, sine!(50, 10), sawtooth!(20), dc_bias!(-5));
 //!
 //! // Use Waveform as an infinite iterator:
-//! let two_seconds_of_samples: Vec<f32> = wf.iter().take(400).collect();
+//! let two_seconds_of_samples: Vec<f32> = waveform.iter().take(400).collect();
 //! ```
 //!
 //! Look into macros section for a complete list of defined periodic functions and their constructors.
@@ -44,9 +41,9 @@
 //! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
 //!
 //! ```
-//! use wavegen::{Waveform, periodic_functions::custom};
+//! use wavegen::{wf, periodic_functions::custom};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![custom(|x| x % 2.0)]);
+//! let waveform = wf!(f64, 100.0, custom(|x| x % 2.0));
 //! ```
 //!
 //! # Overflows

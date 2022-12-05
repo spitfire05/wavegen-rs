@@ -1,5 +1,5 @@
 /* Use Wavegen + Hound to generate a WAVE audio file */
-use wavegen::{sine, wf, Waveform};
+use wavegen::{sine, Waveform};
 
 const SAMPLE_RATE: u16 = 44100; // sample rate
 const FILENAME: &str = "sine.wav"; // output file name

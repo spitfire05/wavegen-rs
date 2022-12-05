@@ -16,7 +16,7 @@
 #[macro_export]
 macro_rules! wf {
     ($st:ty, $sf:expr) => {
-        $crate::Waveform::<$st>::new($sf);
+        $crate::Waveform::<$st>::new($sf)
     };
     ($st:ty, $sf:expr, $($comp:expr),+) => {
         {
@@ -173,6 +173,23 @@ mod tests {
     use float_cmp::approx_eq;
 
     const EPS: f64 = 1e-3;
+
+    #[test]
+    fn empty_waveform_has_zero_components() {
+        let wf = wf!(f64, 44100);
+        assert_eq!(0, wf.get_components_len());
+    }
+
+    #[test]
+    fn wavefrom_with_one_component() {
+        let wf = wf!(f64, 44100, sine!(500));
+        assert_eq!(1, wf.get_components_len());
+    }
+    #[test]
+    fn wavefrom_with_three_components() {
+        let wf = wf!(f64, 44100, sine!(500), square!(1000), sawtooth!(1500));
+        assert_eq!(3, wf.get_components_len());
+    }
 
     #[test]
     fn dc_bias_is_const_for_any_input() {
