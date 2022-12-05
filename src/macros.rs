@@ -13,24 +13,24 @@
 /// let sine_waveform = wf!(f64, 44100, sine!(50));
 /// let some_other_waveform = wf!(i64, 22000, sine!(100), square!(200));
 /// ```
+///
+/// [`Waveform`]: struct.waveform.html
 #[macro_export]
 macro_rules! wf {
-    ($st:ty, $sf:expr) => {
-        $crate::Waveform::<$st>::new($sf)
+    ($sample_type:ty, $sample_rate:expr) => {
+        $crate::Waveform::<$sample_type>::new($sample_rate)
     };
-    ($st:ty, $sf:expr, $($comp:expr),+) => {
+    ($sample_type:ty, $sample_rate:expr, $($comp:expr),+) => {
         {
             extern crate alloc;
-            let __wf = $crate::Waveform::<$st>::with_components($sf, <[_]>::into_vec(
-                alloc::boxed::Box::new([$($comp),+])
-            ));
+            let __wf = $crate::Waveform::<$sample_type>::with_components($sample_rate, alloc::vec![$($comp,)+]);
 
             __wf
         }
     };
 }
 
-/// Builder macro for DC Bias [PeriodicFunction].
+/// Builder macro for DC Bias [`PeriodicFunction`].
 ///
 /// Takes just one argument - the bias value.
 ///
@@ -44,6 +44,8 @@ macro_rules! wf {
 ///
 /// assert!((0..100000).all(|x| bias(x as f64) == 10.0))
 /// ```
+///
+/// [`PeriodicFunction`]: type.periodicfunction.html
 #[macro_export]
 macro_rules! dc_bias {
     ($bias:expr) => {
@@ -51,7 +53,7 @@ macro_rules! dc_bias {
     };
 }
 
-/// Builder macro for Sine [PeriodicFunction].
+/// Builder macro for Sine [`PeriodicFunction`].
 ///
 /// Takes up to 3 arguments - frequency {amplitude, {phase}}
 ///
@@ -60,6 +62,8 @@ macro_rules! dc_bias {
 /// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
 /// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
 /// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
+///
+/// [`PeriodicFunction`]: type.periodicfunction.html
 #[macro_export]
 macro_rules! sawtooth {
     ($frequency:expr) => {
@@ -82,7 +86,7 @@ macro_rules! sawtooth {
     };
 }
 
-/// Builder macro for Sine [PeriodicFunction].
+/// Builder macro for Sine [`PeriodicFunction`].
 ///
 /// Takes up to 3 arguments - frequency {amplitude, {phase}}
 ///
@@ -115,6 +119,8 @@ macro_rules! sawtooth {
 ///
 /// let sine = sine!(50, 20, 0.5);
 /// ```
+///
+/// [`PeriodicFunction`]: type.periodicfunction.html
 #[macro_export]
 macro_rules! sine {
     (frequency: $frequency:expr) => {
@@ -137,7 +143,7 @@ macro_rules! sine {
     };
 }
 
-/// Builder macro for Square [PeriodicFunction].
+/// Builder macro for Square [`PeriodicFunction`].
 ///
 /// Takes up to 3 arguments - frequency {amplitude, {phase}}
 ///
@@ -146,6 +152,8 @@ macro_rules! sine {
 /// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
 /// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
 /// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
+///
+/// [`PeriodicFunction`]: type.periodicfunction.html
 #[macro_export]
 macro_rules! square {
     (frequency: $frequency:expr) => {
