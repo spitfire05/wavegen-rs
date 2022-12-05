@@ -130,6 +130,7 @@ extern crate alloc;
 
 pub mod periodic_functions;
 
+mod macros;
 mod waveform;
 
 use alloc::boxed::Box;
