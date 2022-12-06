@@ -56,7 +56,7 @@ macro_rules! dc_bias {
     };
 }
 
-/// Builder macro for Sine [`PeriodicFunction`].
+/// Builder macro for Sawtooth [`PeriodicFunction`].
 ///
 /// Takes up to 3 arguments - frequency {amplitude, {phase}}
 ///
