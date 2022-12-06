@@ -66,6 +66,7 @@ fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// Sine function builder. See the [`macro`] for more info.
 ///
 /// [`macro`]: ../macro.sine.html
+#[inline(always)]
 pub fn sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     _sine(frequency, amplitude, phase)
 }
@@ -90,6 +91,7 @@ fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 /// Square function builder. See the [`macro`] for more info.
 ///
 /// [`macro`]: ../macro.square.html
+#[inline(always)]
 pub fn square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
     _square(frequency, amplitude, phase)
 }
