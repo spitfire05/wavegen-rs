@@ -10,8 +10,13 @@
 /// use wavegen::{wf, sine, square};
 ///
 /// let empty_waveform = wf!(f32, 16000);
+/// assert_eq!(0, empty_waveform.get_components_len());
+///
 /// let sine_waveform = wf!(f64, 44100, sine!(50));
+/// assert_eq!(1, sine_waveform.get_components_len());
+///
 /// let some_other_waveform = wf!(i64, 22000, sine!(100), square!(200));
+/// assert_eq!(2, some_other_waveform.get_components_len());
 /// ```
 ///
 /// [`Waveform`]: struct.waveform.html
