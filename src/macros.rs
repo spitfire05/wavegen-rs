@@ -43,9 +43,7 @@ macro_rules! wf {
 ///
 /// Defines bias of amplitude +10
 /// ```
-/// use wavegen::dc_bias;
-///
-/// let bias = dc_bias!(10);
+/// let bias = wavegen::dc_bias!(10);
 ///
 /// assert!((0..100000).all(|x| bias(x as f64) == 10.0))
 /// ```
@@ -72,19 +70,19 @@ macro_rules! dc_bias {
 #[macro_export]
 macro_rules! sawtooth {
     ($frequency:expr) => {
-        sawtooth!($frequency, 1.0, 0.0)
+        $crate::sawtooth!($frequency, 1.0, 0.0)
     };
     (frequency: $frequency:expr) => {
-        sawtooth!($frequency)
+        $crate::sawtooth!($frequency)
     };
     ($frequency:expr, $amplitude:expr) => {
-        sawtooth!($frequency, $amplitude, 0.0)
+        $crate::sawtooth!($frequency, $amplitude, 0.0)
     };
     (frequency: $frequency:expr, amplitude: $amplitude:expr) => {
-        sawtooth!($frequency, $amplitude)
+        $crate::sawtooth!($frequency, $amplitude)
     };
     (frequency: $frequency:expr, amplitude: $amplitude:expr, phase: $phase:expr) => {
-        sawtooth!($frequency, $amplitude, 0.0)
+        $crate::sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
         $crate::periodic_functions::sawtooth($frequency as f64, $amplitude as f64, $phase as f64)
@@ -105,43 +103,36 @@ macro_rules! sawtooth {
 ///
 /// 50 Hz sine of amplitude 1 and no phase shift
 /// ```
-/// use wavegen::sine;
-///
-/// let sine = sine!(50);
+/// let sine = wavegen::sine!(50);
 /// ```
 ///
 /// 50 Hz sine of amplitude 20 and no phase shift
 /// ```
-/// use wavegen::sine;
-///
-/// let sine = sine!(frequency: 50, amplitude: 20);
+/// let sine = wavegen::sine!(frequency: 50, amplitude: 20);
 /// ```
 ///
 /// 50 Hz sine of amplitude 20 and phase shift of half a turn
 /// ```
-/// use core::f64::consts::PI;
-/// use wavegen::sine;
-///
-/// let sine = sine!(50, 20, 0.5);
+/// let sine = wavegen::sine!(50, 20, 0.5);
 /// ```
 ///
 /// [`PeriodicFunction`]: type.periodicfunction.html
 #[macro_export]
 macro_rules! sine {
     (frequency: $frequency:expr) => {
-        sine!($frequency)
+        $crate::sine!($frequency)
     };
     (frequency: $frequency:expr, amplitude: $amplitude:expr) => {
-        sine!($frequency, $amplitude)
+        $crate::sine!($frequency, $amplitude)
     };
     (frequency: $frequency:expr, amplitude: $amplitude:expr, phase: $phase:expr) => {
-        sine!($frequency, $amplitude, $phase)
+        $crate::sine!($frequency, $amplitude, $phase)
     };
     ($frequency:expr) => {
-        sine!($frequency, 1.0, 0.0)
+        $crate::sine!($frequency, 1.0, 0.0)
     };
     ($frequency:expr, $amplitude:expr) => {
-        sine!($frequency, $amplitude, 0.0)
+        $crate::sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
         $crate::periodic_functions::sine($frequency as f64, $amplitude as f64, $phase as f64)
@@ -162,19 +153,19 @@ macro_rules! sine {
 #[macro_export]
 macro_rules! square {
     (frequency: $frequency:expr) => {
-        square!($frequency)
+        $crate::square!($frequency)
     };
     (frequency: $frequency:expr, amplitude: $amplitude:expr) => {
-        square!($frequency, $amplitude)
+        $crate::square!($frequency, $amplitude)
     };
     (frequency: $frequency:expr, amplitude: $amplitude:expr, phase: $phase:expr) => {
-        square!($frequency, $amplitude, 0.0)
+        $crate::square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr) => {
-        square!($frequency, 1.0, 0.0)
+        $crate::square!($frequency, 1.0, 0.0)
     };
     ($frequency:expr, $amplitude:expr) => {
-        square!($frequency, $amplitude, 0.0)
+        $crate::square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
         $crate::periodic_functions::square($frequency as f64, $amplitude as f64, $phase as f64)
