@@ -32,6 +32,7 @@ jobs:
     - name: Build
       run: cargo build --verbose ${{ matrix.build_args }}
     - name: Run tests
+      if: ${{ matrix.toolchain }} == "stable"
       run: cargo test --verbose ${{ matrix.build_args }}
       
   lint:
