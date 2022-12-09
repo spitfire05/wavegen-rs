@@ -4,6 +4,7 @@ version = "0.3.0"
 edition = "2021"
 authors = ["Michal Borejszo <michael.borejszo@gmail.com>"]
 license = "MIT"
+rust-version = "1.56"
 description = "Wavefrom generator library"
 repository = "https://github.com/spitfire05/wavegen-rs"
 readme = "README.md"
