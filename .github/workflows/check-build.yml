@@ -4,7 +4,7 @@ on:
   push:
     branches: [master, staging, trying]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 env:
@@ -14,45 +14,46 @@ jobs:
   build:
     strategy:
       matrix:
-        build_args: ["", "--no-default-features --features libm", "--features libm"]
+        build_args:
+          ["", "--no-default-features --features libm", "--features libm"]
         toolchain: ["stable", "1.56.1"]
 
     runs-on: ubuntu-latest
-    
+
     env:
       RUSTFLAGS: "--deny warnings"
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: ${{ matrix.toolchain }}
-        override: true
-    - name: Build
-      run: cargo build --verbose ${{ matrix.build_args }}
-    - name: Run tests
-      if: ${{ matrix.toolchain }} == "stable"
-      run: cargo test --verbose ${{ matrix.build_args }}
-      
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.toolchain }}
+          override: true
+      - name: Build
+        run: cargo build --verbose ${{ matrix.build_args }}
+      - name: Run tests
+        if: matrix.toolchain == "stable"
+        run: cargo test --verbose ${{ matrix.build_args }}
+
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-        components: rustfmt, clippy
-    - name: Check code formatting
-      run: cargo fmt -- --check
-    - name: Run Clippy
-      uses: actions-rs/clippy-check@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        args: --all-features
-        
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+      - name: Check code formatting
+        run: cargo fmt -- --check
+      - name: Run Clippy
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+
   # This job should depend on all required jobs.
   # We will make Bors watch this job to tell whether to merge or not.
   done:
