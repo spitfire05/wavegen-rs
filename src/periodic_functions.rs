@@ -21,7 +21,9 @@ pub fn custom<F: Fn(f64) -> f64 + Send + Sync + 'static>(f: F) -> PeriodicFuncti
 /// DC Bias function builder. See the [`macro`] for more info.
 ///
 /// [`macro`]: ../macro.dc_bias.html
-pub fn dc_bias(bias: f64) -> PeriodicFunction {
+pub fn dc_bias(bias: impl Into<f64>) -> PeriodicFunction {
+    let bias = bias.into();
+
     Box::new(move |_| bias)
 }
 
@@ -43,7 +45,15 @@ fn frac(x: f64) -> f64 {
 /// Sawtooth function builder. See the [`macro`] for more info.
 ///
 /// [`macro`]: ../macro.sawtooth.html
-pub fn sawtooth(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+pub fn sawtooth(
+    frequency: impl Into<f64>,
+    amplitude: impl Into<f64>,
+    phase: impl Into<f64>,
+) -> PeriodicFunction {
+    let frequency = frequency.into();
+    let amplitude = amplitude.into();
+    let phase = phase.into();
+
     Box::new(move |t| 2.0 * amplitude * frac(t * frequency + phase) - amplitude)
 }
 
@@ -67,7 +77,15 @@ fn _sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 ///
 /// [`macro`]: ../macro.sine.html
 #[inline(always)]
-pub fn sine(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+pub fn sine(
+    frequency: impl Into<f64>,
+    amplitude: impl Into<f64>,
+    phase: impl Into<f64>,
+) -> PeriodicFunction {
+    let frequency = frequency.into();
+    let amplitude = amplitude.into();
+    let phase = phase.into();
+
     _sine(frequency, amplitude, phase)
 }
 
@@ -92,7 +110,15 @@ fn _square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
 ///
 /// [`macro`]: ../macro.square.html
 #[inline(always)]
-pub fn square(frequency: f64, amplitude: f64, phase: f64) -> PeriodicFunction {
+pub fn square(
+    frequency: impl Into<f64>,
+    amplitude: impl Into<f64>,
+    phase: impl Into<f64>,
+) -> PeriodicFunction {
+    let frequency = frequency.into();
+    let amplitude = amplitude.into();
+    let phase = phase.into();
+
     _square(frequency, amplitude, phase)
 }
 

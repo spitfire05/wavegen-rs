@@ -45,14 +45,14 @@ macro_rules! wf {
 /// ```
 /// let bias = wavegen::dc_bias!(10);
 ///
-/// assert!((0..100000).all(|x| bias(x as f64) == 10.0))
+/// assert!((0..100000).all(|x| bias(x.into()) == 10.0))
 /// ```
 ///
 /// [`PeriodicFunction`]: type.periodicfunction.html
 #[macro_export]
 macro_rules! dc_bias {
     ($bias:expr) => {
-        $crate::periodic_functions::dc_bias($bias as f64)
+        $crate::periodic_functions::dc_bias($bias)
     };
 }
 
@@ -85,7 +85,7 @@ macro_rules! sawtooth {
         $crate::sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sawtooth($frequency as f64, $amplitude as f64, $phase as f64)
+        $crate::periodic_functions::sawtooth($frequency, $amplitude, $phase)
     };
 }
 
@@ -135,7 +135,7 @@ macro_rules! sine {
         $crate::sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sine($frequency as f64, $amplitude as f64, $phase as f64)
+        $crate::periodic_functions::sine($frequency, $amplitude, $phase)
     };
 }
 
@@ -168,7 +168,7 @@ macro_rules! square {
         $crate::square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::square($frequency as f64, $amplitude as f64, $phase as f64)
+        $crate::periodic_functions::square($frequency, $amplitude, $phase)
     };
 }
 
@@ -199,7 +199,7 @@ mod tests {
     fn dc_bias_is_const_for_any_input() {
         let y = 42.0;
         let dc = dc_bias!(y);
-        for x in (0..10000000).map(|x| x as f64) {
+        for x in (0..10000000).map(|x| x.into()) {
             assert_eq!(dc(x), y);
         }
     }
