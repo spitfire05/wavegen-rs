@@ -12,28 +12,25 @@
 
 ```toml
 [dependencies]
-wavegen = "0.2"
+wavegen = "0.3"
 ```
 Or, to use the *no_std* version (custom global allocator is required):
 
 ```toml
 [dependencies]
-wavegen = { version = "0.2", default-features = false, features = ["libm"] }
+wavegen = { version = "0.3", default-features = false, features = ["libm"] }
 ```
 
 2) Define a waveform with sampling frequency and function components:
 
 ```rust
-let wf = Waveform::<f64>::with_components(200.0, vec![
-        sine!(frequency: 100, amplitude: 10),
-        dc_bias!(20)
-    ]);
+let waveform = wf!(f64, 200, sine!(frequency: 100, amplitude: 10), dc_bias!(20));
 ```
 
 3) Turn it into an iterator and sample:
 
 ```rust
-let some_samples: Vec<f64> = wf.iter().take(200).collect();
+let some_samples: Vec<f64> = waveform.iter().take(200).collect();
 ```
 
 Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.

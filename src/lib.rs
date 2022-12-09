@@ -3,17 +3,14 @@
 //! # Quickstart
 //!
 //! ```
-//! use wavegen::{Waveform, sine, dc_bias, sawtooth};
+//! use wavegen::{wf, sine, dc_bias, sawtooth};
 //!
 //! // Define a Waveform with 200Hz sampling rate and three function components,
-//! // choosing f32 as the ouput type:
-//! let wf = Waveform::<f32>::with_components(
-//!     200.0,
-//!     vec![sine!(50, 10), sawtooth!(20), dc_bias!(-5)]
-//! );
+//! // choosing f32 as the output type:
+//! let waveform = wf!(f32, 200, sine!(50, 10), sawtooth!(20), dc_bias!(-5));
 //!
 //! // Use Waveform as an infinite iterator:
-//! let two_seconds_of_samples: Vec<f32> = wf.iter().take(400).collect();
+//! let two_seconds_of_samples: Vec<f32> = waveform.iter().take(400).collect();
 //! ```
 //!
 //! Look into macros section for a complete list of defined periodic functions and their constructors.
@@ -44,9 +41,9 @@
 //! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
 //!
 //! ```
-//! use wavegen::Waveform;
+//! use wavegen::{wf, periodic_functions::custom};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![Box::new(|x| x % 2 as f64)]);
+//! let waveform = wf!(f64, 100.0, custom(|x| x % 2.0));
 //! ```
 //!
 //! # Overflows
@@ -74,26 +71,30 @@
 //! assert_eq!(sample, i32::MAX);
 //! ```
 //!
-//! # Iterator panics
+//! # Iterator infinity
 //!
-//! The `WaveformIterator::next()` method can panic in some rare cases if it is not able to convert the inner sample type `f64` into the target sample type.
+//! `WaveformIterator` is a *mostly* infinite iterator, with one exception:
 //!
-//! ```should_panic
-//! use wavegen::{Waveform, dc_bias};
+//! The `WaveformIterator::next()` method can return `None` in some rare cases if it is not able to convert the inner sample type `f64` into the target sample type.
 //!
-//! let wf = Waveform::<i32>::with_components(100.0, vec![dc_bias![f64::NAN]]);
-//!
-//! // 'f64::NAN` can't be converted into `i32`, code below will panic
-//! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
-//! ```
-//!
+//! `f64::NAN` cannot be represented as `i32`:
 //! ```
 //! use wavegen::{Waveform, dc_bias};
 //!
-//! let wf = Waveform::<f32>::with_components(100.0, vec![dc_bias![f64::NAN]]);
+//! let mut wf = Waveform::<i32>::new(100.0);
+//! wf.add_component(dc_bias!(f64::NAN));
 //!
-//! // This however is fine, as `f64::NAN` can be represented as `f32::NAN`
-//! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
+//! assert_eq!(None, wf.iter().next())
+//! ```
+//!
+//! This however is fine, as `f64::NAN` can be represented as `f32::NAN`:
+//! ```
+//! use wavegen::{Waveform, dc_bias};
+//!
+//! let mut wf = Waveform::<f32>::new(100.0);
+//! wf.add_component(dc_bias!(f64::NAN));
+//!
+//! assert!(wf.iter().next().unwrap().is_nan())
 //! ```
 //!
 //! It is probably a good practice to sanitize the parameters of the periodic function before it is constructed.
@@ -124,9 +125,9 @@ compile_error!("at least one of \"libm\", \"std\" features has to be enabled");
 
 extern crate alloc;
 
-#[doc(hidden)]
 pub mod periodic_functions;
 
+mod macros;
 mod waveform;
 
 use alloc::boxed::Box;

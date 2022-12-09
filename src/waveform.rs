@@ -1,10 +1,7 @@
-use core::marker::PhantomData;
-
-use alloc::{vec, vec::Vec};
-
-use num_traits::{Bounded, NumCast};
-
 use crate::PeriodicFunction;
+use alloc::{vec, vec::Vec};
+use core::marker::PhantomData;
+use num_traits::{Bounded, NumCast};
 
 /// Helper trait defining all the types that can be used as [Waveform]'s sample type.
 pub trait SampleType: NumCast + Bounded {}
@@ -34,7 +31,8 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
-    pub fn new(sample_rate: f64) -> Self {
+    pub fn new(sample_rate: impl Into<f64>) -> Self {
+        let sample_rate = sample_rate.into();
         Self::assert_sane(sample_rate);
 
         Waveform {
@@ -57,7 +55,8 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: f64, components: Vec<PeriodicFunction>) -> Self {
+    pub fn with_components(sample_rate: impl Into<f64>, components: Vec<PeriodicFunction>) -> Self {
+        let sample_rate = sample_rate.into();
         Self::assert_sane(sample_rate);
 
         Waveform {
@@ -167,7 +166,7 @@ impl<'a, T: SampleType> WaveformIterator<'a, T> {
             } else if sample < 0.0 {
                 Some(T::min_value())
             } else {
-                panic!("Sample {} cannot be converted to waveform type.", sample);
+                None
             }
         })
     }
@@ -273,6 +272,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::iter_skip_next)]
     fn waveform_iterator_is_infinite() {
         let wf = Waveform::<f64>::new(f64::MIN_POSITIVE);
         let mut iter = wf.iter().skip(usize::MAX);
@@ -351,6 +351,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::iter_nth_zero)]
     fn nth_and_next_give_same_results() {
         let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
         let mut i1 = wf.iter();

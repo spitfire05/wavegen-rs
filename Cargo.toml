@@ -1,14 +1,21 @@
 [package]
 name = "wavegen"
-version = "0.2.2"
+version = "0.3.0"
 edition = "2021"
 authors = ["Michal Borejszo <michael.borejszo@gmail.com>"]
 license = "MIT"
+rust-version = "1.56"
 description = "Wavefrom generator library"
 repository = "https://github.com/spitfire05/wavegen-rs"
 readme = "README.md"
 keywords = ["waveform", "signal-processing", "wave-generator", "wave"]
-categories = ["mathematics", "no-std", "multimedia::audio", "science", "embedded"]
+categories = [
+    "mathematics",
+    "no-std",
+    "multimedia::audio",
+    "science",
+    "embedded",
+]
 
 [dependencies]
 libm = { version = "0.2", optional = true }
@@ -17,7 +24,7 @@ num-traits = { version = "0.2", default-features = false }
 [dev-dependencies]
 plotters = "^0.3.1"
 float-cmp = "0.9.0"
-criterion = "0.3"
+criterion = "0.4"
 paste = "1.0"
 hound = "3.5.0"
 

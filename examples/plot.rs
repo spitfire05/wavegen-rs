@@ -1,84 +1,93 @@
-use std::path::Path;
-
 use plotters::prelude::*;
-use wavegen::{sawtooth, sine, square, Waveform};
-
-macro_rules! draw {
-    ($sample_rate:expr, $path:expr, $label:expr, $waveform:expr) => {
-        draw_internal(
-            $path,
-            $label,
-            $waveform
-                .iter()
-                .enumerate()
-                .map(|(i, x)| (i as f32 / $sample_rate as f32, x))
-                .take($sample_rate as usize),
-        )
-    };
-}
+use std::path::Path;
+use wavegen::{sawtooth, sine, square, wf, Waveform};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sample_rate = 800.0;
 
-    draw!(
+    draw(
         sample_rate,
         "sine.png",
         "Sine",
-        Waveform::<f32>::with_components(sample_rate, vec![sine![1.0]])
+        wf!(f32, sample_rate, sine!(1)),
     )?;
 
-    draw!(
+    draw(
         sample_rate,
         "sine_double.png",
         "Sines",
-        Waveform::<f32>::with_components(sample_rate, vec![sine!(1.0), sine!(1.0, 1.0, 0.25)])
+        wf!(f32, sample_rate, sine!(1.0), sine!(1.0, 1.0, 0.25)),
     )?;
 
-    draw!(
+    draw(
         sample_rate,
         "sawtooth.png",
         "Sawtooth",
-        Waveform::<f32>::with_components(sample_rate, vec![sawtooth!(2, 1, 0.0)])
+        wf!(f32, sample_rate, sawtooth!(2, 1, 0.0)),
     )?;
 
-    draw!(
+    draw(
         sample_rate,
         "sawtooth_sinesised.png",
         "Sawtooth with sine",
-        Waveform::<f32>::with_components(
+        wf!(
+            f32,
             sample_rate,
-            vec![sawtooth!(2, 1, 0.0), sine!(frequency: 50, amplitude: 0.1)]
-        )
+            sawtooth!(2, 1, 0.0),
+            sine!(frequency: 50, amplitude: 0.1)
+        ),
     )?;
 
-    draw!(
+    draw(
         sample_rate,
         "square.png",
         "Square",
-        Waveform::<f32>::with_components(sample_rate, vec![square!(2)])
+        wf!(f32, sample_rate, square!(2)),
     )?;
 
-    draw!(
+    draw(
         sample_rate,
         "funky.png",
         "Something funky",
-        Waveform::<f32>::with_components(
+        wf!(
+            f32,
             sample_rate,
-            vec![sine!(10, 0.3), sawtooth!(2, 0.3), square!(3, 0.3)]
-        )
+            sine!(10, 0.3),
+            sawtooth!(2, 0.3),
+            square!(3, 0.3)
+        ),
     )?;
 
-    draw!(
+    draw(
         sample_rate,
         "sines_300_50_hz.png",
         "Sine 300Hz + 50 Hz",
-        Waveform::<f32>::with_components(
+        wf!(
+            f32,
             sample_rate,
-            vec![sine!(frequency: 300), sine!(frequency: 50, amplitude: 0.3)]
-        )
+            sine!(frequency: 300),
+            sine!(frequency: 50, amplitude: 0.3)
+        ),
     )?;
 
     Ok(())
+}
+
+fn draw(
+    sample_rate: f64,
+    path: impl AsRef<Path>,
+    label: impl AsRef<str>,
+    waveform: Waveform<f32>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    draw_internal(
+        path,
+        label.as_ref(),
+        waveform
+            .iter()
+            .enumerate()
+            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
+            .take(sample_rate as usize),
+    )
 }
 
 fn draw_internal<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
@@ -99,14 +108,14 @@ fn draw_internal<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
     chart.configure_mesh().draw()?;
 
     chart
-        .draw_series(LineSeries::new(iter, &RED))?
+        .draw_series(LineSeries::new(iter, RED))?
         .label(label)
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
 
     chart
         .configure_series_labels()
-        .background_style(&WHITE.mix(0.8))
-        .border_style(&BLACK)
+        .background_style(WHITE.mix(0.8))
+        .border_style(BLACK)
         .draw()?;
 
     Ok(())
