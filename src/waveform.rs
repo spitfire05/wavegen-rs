@@ -352,6 +352,7 @@ mod tests {
 
     #[test]
     #[allow(clippy::iter_nth_zero)]
+    #[allow(clippy::unwrap_used)]
     fn nth_and_next_give_same_results() {
         let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
         let mut i1 = wf.iter();
