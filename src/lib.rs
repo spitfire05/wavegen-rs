@@ -128,10 +128,13 @@ extern crate alloc;
 pub mod periodic_functions;
 
 mod macros;
+mod sampling_rate;
 mod waveform;
 
 use alloc::boxed::Box;
 
+pub use sampling_rate::SamplingRate;
+pub use sampling_rate::SamplingRateValueError;
 pub use waveform::SampleType;
 pub use waveform::Waveform;
 

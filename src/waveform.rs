@@ -1,4 +1,4 @@
-use crate::PeriodicFunction;
+use crate::{PeriodicFunction, SamplingRate};
 use alloc::{vec, vec::Vec};
 use core::marker::PhantomData;
 use num_traits::{Bounded, NumCast};
@@ -10,7 +10,7 @@ impl<T> SampleType for T where T: NumCast + Bounded {}
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
 pub struct Waveform<T: SampleType> {
-    sample_rate: f64,
+    sample_rate: SamplingRate,
     components: Vec<PeriodicFunction>,
     _phantom: PhantomData<T>,
 }
@@ -31,10 +31,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
-    pub fn new(sample_rate: impl Into<f64>) -> Self {
-        let sample_rate = sample_rate.into();
-        Self::assert_sane(sample_rate);
-
+    pub fn new(sample_rate: SamplingRate) -> Self {
         Waveform {
             sample_rate,
             components: vec![],
@@ -55,10 +52,7 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: impl Into<f64>, components: Vec<PeriodicFunction>) -> Self {
-        let sample_rate = sample_rate.into();
-        Self::assert_sane(sample_rate);
-
+    pub fn with_components(sample_rate: SamplingRate, components: Vec<PeriodicFunction>) -> Self {
         Waveform {
             sample_rate,
             components,
@@ -94,8 +88,8 @@ impl<T: SampleType> Waveform<T> {
     ///
     /// assert_eq!(42.0, wf.get_sample_rate());
     /// ```
-    pub fn get_sample_rate(&self) -> f64 {
-        self.sample_rate
+    pub fn get_sample_rate(&self) -> &SamplingRate {
+        &self.sample_rate
     }
 
     /// Returns number of components this [Waveform] consists of.
@@ -128,12 +122,6 @@ impl<T: SampleType> Waveform<T> {
             inner: self,
             time: 0.0,
         }
-    }
-
-    #[inline(always)]
-    fn assert_sane(x: f64) {
-        assert!(x.is_normal());
-        assert!(x.is_sign_positive());
     }
 }
 
@@ -172,7 +160,7 @@ impl<'a, T: SampleType> WaveformIterator<'a, T> {
     }
 
     fn increment_time(&mut self, n: usize) {
-        let new_time = self.time + (n as f64 * (1.0 / self.inner.sample_rate));
+        let new_time = self.time + (n as f64 * (1.0 / self.inner.sample_rate.0));
         if new_time.is_finite() {
             self.time = new_time;
         } else {
@@ -334,7 +322,7 @@ mod tests {
             let wf = Waveform::<f32>::new(44100.0);
             assert_eq!((usize::MAX, None), wf.iter().size_hint());
         };
-        ($($component:expr,)*) => {
+        ($($component:expr),*) => {
             let mut wf = Waveform::<f32>::new(44100.0);
             $(
                 wf.add_component($component);
@@ -346,12 +334,13 @@ mod tests {
     #[test]
     fn test_size_hint() {
         test_size_hint!();
-        test_size_hint!(sine!(50),);
-        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4),);
+        test_size_hint!(sine!(50));
+        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4));
     }
 
     #[test]
     #[allow(clippy::iter_nth_zero)]
+    #[allow(clippy::unwrap_used)]
     fn nth_and_next_give_same_results() {
         let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
         let mut i1 = wf.iter();
@@ -360,5 +349,11 @@ mod tests {
         for _ in 0..1000 {
             assert_eq!(i1.next().unwrap(), i2.nth(0).unwrap());
         }
+    }
+
+    #[test]
+    fn waveform_is_send_and_sync() {
+        fn test<T: Send + Sync>() {}
+        test::<Waveform<f64>>();
     }
 }
