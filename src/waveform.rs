@@ -364,8 +364,14 @@ mod tests {
     }
 
     #[test]
-    fn waveform_is_send_and_sync() {
-        fn test<T: Send + Sync>() {}
-        test::<Waveform<f64>>();
+    fn waveform_is_send() {
+        fn assert_send<T: Send>() {}
+        assert_send::<Waveform<f64>>();
+    }
+
+    #[test]
+    fn waveform_is_sync() {
+        fn assert_sync<T: Sync>() {}
+        assert_sync::<Waveform<f64>>();
     }
 }
