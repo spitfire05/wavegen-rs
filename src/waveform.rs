@@ -334,7 +334,7 @@ mod tests {
             let wf = Waveform::<f32>::new(44100.0);
             assert_eq!((usize::MAX, None), wf.iter().size_hint());
         };
-        ($($component:expr,)*) => {
+        ($($component:expr),*) => {
             let mut wf = Waveform::<f32>::new(44100.0);
             $(
                 wf.add_component($component);
@@ -346,12 +346,13 @@ mod tests {
     #[test]
     fn test_size_hint() {
         test_size_hint!();
-        test_size_hint!(sine!(50),);
-        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4),);
+        test_size_hint!(sine!(50));
+        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4));
     }
 
     #[test]
     #[allow(clippy::iter_nth_zero)]
+    #[allow(clippy::unwrap_used)]
     fn nth_and_next_give_same_results() {
         let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
         let mut i1 = wf.iter();
@@ -360,5 +361,17 @@ mod tests {
         for _ in 0..1000 {
             assert_eq!(i1.next().unwrap(), i2.nth(0).unwrap());
         }
+    }
+
+    #[test]
+    fn waveform_is_send() {
+        fn assert_send<T: Send>() {}
+        assert_send::<Waveform<f64>>();
+    }
+
+    #[test]
+    fn waveform_is_sync() {
+        fn assert_sync<T: Sync>() {}
+        assert_sync::<Waveform<f64>>();
     }
 }

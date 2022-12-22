@@ -116,6 +116,8 @@
 
 #![no_std]
 #![deny(missing_docs)]
+#![deny(clippy::unwrap_used)]
+#![deny(clippy::expect_used)]
 
 #[cfg(feature = "std")]
 extern crate std;
