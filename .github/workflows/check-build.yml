@@ -25,11 +25,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.toolchain }}
-          override: true
+      - name: Install toolchain ${{ matrix.toolchain }}
+        run: |
+          rustup install ${{ matrix.toolchain }}
+          rustup override set ${{ matrix.toolchain }}
       - name: Build
         run: cargo build --verbose ${{ matrix.build_args }}
       - name: Run tests
@@ -40,19 +39,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          components: rustfmt, clippy
+      - name: Install toolchain
+        run: |
+          rustup install stable
+          rustup override set stable
       - name: Check code formatting
         run: cargo fmt -- --check
       - name: Run Clippy
-        uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features
+        run: cargo clippy -- --deny clippy::all
 
   # This job should depend on all required jobs.
   # We will make Bors watch this job to tell whether to merge or not.
