@@ -9,13 +9,13 @@
 /// ```
 /// use wavegen::{wf, sine, square};
 ///
-/// let empty_waveform = wf!(f32, 16000);
+/// let empty_waveform = wf!(f32, 16000).unwrap();
 /// assert_eq!(0, empty_waveform.get_components_len());
 ///
-/// let sine_waveform = wf!(f64, 44100, sine!(50));
+/// let sine_waveform = wf!(f64, 44100, sine!(50)).unwrap();
 /// assert_eq!(1, sine_waveform.get_components_len());
 ///
-/// let some_other_waveform = wf!(i64, 22000, sine!(100), square!(200));
+/// let some_other_waveform = wf!(i64, 22000, sine!(100), square!(200)).unwrap();
 /// assert_eq!(2, some_other_waveform.get_components_len());
 /// ```
 ///
@@ -180,18 +180,18 @@ mod tests {
 
     #[test]
     fn empty_waveform_has_zero_components() {
-        let wf = wf!(f64, 44100);
+        let wf = wf!(f64, 44100).unwrap();
         assert_eq!(0, wf.get_components_len());
     }
 
     #[test]
     fn wavefrom_with_one_component() {
-        let wf = wf!(f64, 44100, sine!(500));
+        let wf = wf!(f64, 44100, sine!(500)).unwrap();
         assert_eq!(1, wf.get_components_len());
     }
     #[test]
     fn wavefrom_with_three_components() {
-        let wf = wf!(f64, 44100, sine!(500), square!(1000), sawtooth!(1500));
+        let wf = wf!(f64, 44100, sine!(500), square!(1000), sawtooth!(1500)).unwrap();
         assert_eq!(3, wf.get_components_len());
     }
 

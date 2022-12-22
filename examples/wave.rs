@@ -8,7 +8,7 @@ const WAVE_TIME_S: f32 = 1.0; // audio length in seconds
 fn main() {
     // Define waveform
     // 500 Hz sine spanned from i16::MIN to i16::MAX
-    let wf = wf!(i16, SAMPLE_RATE, sine!(500, i16::MAX));
+    let wf = wf!(i16, SAMPLE_RATE, sine!(500, i16::MAX)).unwrap();
 
     // WAVE file specification
     let spec = hound::WavSpec {
