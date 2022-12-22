@@ -23,14 +23,12 @@
 #[macro_export]
 macro_rules! wf {
     ($sample_type:ty, $sample_rate:expr) => {
-        $crate::Waveform::<$sample_type>::new($crate::SamplingRate::new($sample_rate).expect("Sample rate has to be non-zero, finite, positive value."))
+        $crate::Waveform::<$sample_type>::new($sample_rate)
     };
     ($sample_type:ty, $sample_rate:expr, $($comp:expr),+) => {
         {
             extern crate alloc;
-            let __wf = $crate::Waveform::<$sample_type>::with_components(
-                $crate::SamplingRate::new($sample_rate).expect("Sample rate has to be non-zero, finite, positive value."),
-                alloc::vec![$($comp,)+]);
+            let __wf = $crate::Waveform::<$sample_type>::with_components($sample_rate, alloc::vec![$($comp,)+]);
 
             __wf
         }
