@@ -39,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install toolchain ${{ matrix.toolchain }}
+      - name: Install toolchain
         run: |
-          rustup install ${{ matrix.toolchain }}
-          rustup override set ${{ matrix.toolchain }}
+          rustup install stable
+          rustup override set stable
       - name: Check code formatting
         run: cargo fmt -- --check
       - name: Run Clippy
