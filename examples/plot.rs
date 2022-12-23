@@ -118,5 +118,7 @@ fn draw_internal<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
         .border_style(BLACK)
         .draw()?;
 
+    root.present()?;
+
     Ok(())
 }

@@ -301,7 +301,7 @@ mod tests {
         assert_eq!(samples[0], u8::MIN);
     }
 
-    macro_rules! test_wavefrom_err {
+    macro_rules! test_waveform_err {
         ($($name:ident: $sample_rate:expr)*) => {
             $(
                 paste! {
@@ -321,7 +321,7 @@ mod tests {
         };
     }
 
-    test_wavefrom_err! {
+    test_waveform_err! {
         nan: f64::NAN
         negative: -1f64
         zero: 0.0

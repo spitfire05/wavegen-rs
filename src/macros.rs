@@ -62,7 +62,7 @@ macro_rules! dc_bias {
 ///
 /// | argument | unit | notes |
 /// | -------- | ---- | ----- |
-/// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
+/// | frequency | Hz | Frequency of the periodic function. Also: 1 / period |
 /// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
 /// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
 ///
@@ -95,7 +95,7 @@ macro_rules! sawtooth {
 ///
 /// | argument | unit | notes |
 /// | -------- | ---- | ----- |
-/// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
+/// | frequency | Hz | Frequency of the periodic function. Also: 1 / period |
 /// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
 /// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
 ///
@@ -145,7 +145,7 @@ macro_rules! sine {
 ///
 /// | argument | unit | notes |
 /// | -------- | ---- | ----- |
-/// | frequency | Hz | Frequecy of the periodic function. Also: 1 / period |
+/// | frequency | Hz | Frequency of the periodic function. Also: 1 / period |
 /// | amplitude | *arbitrary* | The amplitude of the function in 0-peak notation. |
 /// | phase | *periods* | The phase shift of the function. Value of 1 means full shift around.
 ///
@@ -185,12 +185,12 @@ mod tests {
     }
 
     #[test]
-    fn wavefrom_with_one_component() {
+    fn waveform_with_one_component() {
         let wf = wf!(f64, 44100, sine!(500)).unwrap();
         assert_eq!(1, wf.get_components_len());
     }
     #[test]
-    fn wavefrom_with_three_components() {
+    fn waveform_with_three_components() {
         let wf = wf!(f64, 44100, sine!(500), square!(1000), sawtooth!(1500)).unwrap();
         assert_eq!(3, wf.get_components_len());
     }

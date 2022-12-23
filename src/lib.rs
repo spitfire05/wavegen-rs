@@ -101,9 +101,9 @@
 //!
 //! # Note about Nyquist-Shannon rule enforcement
 //!
-//! As a rule of thumb in signal processing, the sampling frequency should be *at least* 2 times bigger than the highest frequency of sampled continous signal.
+//! As a rule of thumb in signal processing, the sampling frequency should be *at least* 2 times bigger than the highest frequency of sampled continuos signal.
 //!
-//! This lib will **not** enforce the Nyquist-Shannon rule on the waveforms you create, therefore abominations like this are possible (altough not recommended):
+//! This lib will **not** enforce the Nyquist-Shannon rule on the waveforms you create, therefore abominations like this are possible (although not recommended):
 //!
 //! ```
 //! use wavegen::{Waveform, sine};
