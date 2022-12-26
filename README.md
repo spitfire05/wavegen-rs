@@ -12,13 +12,13 @@
 
 ```toml
 [dependencies]
-wavegen = "0.3"
+wavegen = "0.4"
 ```
 Or, to use the *no_std* version (custom global allocator is required):
 
 ```toml
 [dependencies]
-wavegen = { version = "0.3", default-features = false, features = ["libm"] }
+wavegen = { version = "0.4", default-features = false, features = ["libm"] }
 ```
 
 2) Define a waveform with sampling frequency and function components:
