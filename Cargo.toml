@@ -30,6 +30,7 @@ hound = "3.5.0"
 
 [features]
 default = ["std"]
+libm = ["dep:libm", "num-traits/libm"]
 std = []
 
 [lib]

@@ -51,8 +51,8 @@ macro_rules! wf {
 /// [`PeriodicFunction`]: type.periodicfunction.html
 #[macro_export]
 macro_rules! dc_bias {
-    ($bias:expr) => {
-        $crate::periodic_functions::dc_bias($bias)
+    ($bias:expr, $t:ty) => {
+        $crate::PeriodicFunction::<$t>::dc_bias($bias)
     };
 }
 
@@ -85,7 +85,7 @@ macro_rules! sawtooth {
         $crate::sawtooth!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sawtooth($frequency, $amplitude, $phase)
+        $crate::PeriodicFunction::sawtooth($frequency, $amplitude, $phase)
     };
 }
 
@@ -135,7 +135,7 @@ macro_rules! sine {
         $crate::sine!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::sine($frequency, $amplitude, $phase)
+        $crate::PeriodicFunction::sine($frequency, $amplitude, $phase)
     };
 }
 
@@ -168,7 +168,7 @@ macro_rules! square {
         $crate::square!($frequency, $amplitude, 0.0)
     };
     ($frequency:expr, $amplitude:expr, $phase:expr) => {
-        $crate::periodic_functions::square($frequency, $amplitude, $phase)
+        $crate::PeriodicFunction::square($frequency, $amplitude, $phase)
     };
 }
 
@@ -198,9 +198,9 @@ mod tests {
     #[test]
     fn dc_bias_is_const_for_any_input() {
         let y = 42.0;
-        let dc = dc_bias!(y);
+        let dc = dc_bias!(y, f64);
         for x in (0..10000000).map(|x| x.into()) {
-            assert_eq!(dc(x), y);
+            assert_eq!(dc.sample(x), y);
         }
     }
 
@@ -208,17 +208,17 @@ mod tests {
     fn default_sawtooth_has_amplitude_of_one() {
         let f = sawtooth!(2.0);
 
-        assert!(approx_eq!(f64, f(0.49999), 1.0, epsilon = EPS));
-        assert!(approx_eq!(f64, f(0.5), -1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, f.sample(0.49999), 1.0, epsilon = EPS));
+        assert!(approx_eq!(f64, f.sample(0.5), -1.0, epsilon = EPS));
     }
 
     #[test]
     fn default_sine_has_amplitude_of_one_and_no_phase_shift() {
         let sine = sine!(1);
 
-        let max = sine(0.25);
-        let min = sine(0.75);
-        let zero = sine(0.5);
+        let max = sine.sample(0.25);
+        let min = sine.sample(0.75);
+        let zero = sine.sample(0.5);
 
         assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
         assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
@@ -229,9 +229,9 @@ mod tests {
     fn sine_phase_affects_min_max_amplitude_position() {
         let sine = sine!(1, 1, 0.5);
 
-        let max = sine(0.75);
-        let min = sine(0.25);
-        let zero = sine(0.5);
+        let max = sine.sample(0.75);
+        let min = sine.sample(0.25);
+        let zero = sine.sample(0.5);
 
         assert!(approx_eq!(f64, max, 1.0, epsilon = EPS));
         assert!(approx_eq!(f64, min, -1.0, epsilon = EPS));
@@ -243,11 +243,11 @@ mod tests {
         let square = square!(1);
 
         for x in [0.0, 0.1, 0.2, 0.3, 0.4] {
-            assert!(approx_eq!(f64, square(x), 1.0, epsilon = EPS))
+            assert!(approx_eq!(f64, square.sample(x), 1.0, epsilon = EPS))
         }
 
         for x in [0.5, 0.6, 0.7, 0.8, 0.9] {
-            assert!(approx_eq!(f64, square(x), -1.0, epsilon = EPS))
+            assert!(approx_eq!(f64, square.sample(x), -1.0, epsilon = EPS))
         }
     }
 }

@@ -132,10 +132,29 @@ pub mod periodic_functions;
 mod macros;
 mod waveform;
 
-use alloc::boxed::Box;
-
+use core::iter::Sum;
+use core::ops::Add;
+use num_traits::FloatConst;
+use num_traits::{Float, One};
+pub use periodic_functions::PeriodicFunction;
 pub use waveform::SampleType;
 pub use waveform::Waveform;
 
-/// Type alias defining a periodic function (f64 -> f64 map)
-pub type PeriodicFunction = Box<dyn Fn(f64) -> f64 + Send + Sync>;
+/// Defines precision of inner [`Waveform`] and `[PeriodicFunction`] calcualtions.
+pub trait Precision: Float + FloatConst + Sum + Send + Sync + 'static {}
+
+impl<T> Precision for T where T: Float + FloatConst + Sum + Send + Sync + 'static {}
+
+trait Two {
+    fn two() -> Self;
+}
+
+impl<T> Two for T
+where
+    T: One + Add<Output = T>,
+{
+    #[inline(always)]
+    fn two() -> Self {
+        T::one() + T::one()
+    }
+}

@@ -1,7 +1,8 @@
-use crate::PeriodicFunction;
-use alloc::{vec, vec::Vec};
-use core::marker::PhantomData;
+use alloc::{boxed::Box, vec, vec::Vec};
+use core::{iter::Sum, marker::PhantomData};
 use num_traits::{float::FloatCore, Bounded, NumCast};
+
+use crate::{PeriodicFunction, Precision};
 
 /// Helper trait defining all the types that can be used as [Waveform]'s sample type.
 pub trait SampleType: NumCast + Bounded {}
@@ -9,13 +10,13 @@ pub trait SampleType: NumCast + Bounded {}
 impl<T> SampleType for T where T: NumCast + Bounded {}
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
-pub struct Waveform<T: SampleType, P: FloatCore = f64> {
+pub struct Waveform<T: SampleType, P: Precision = f64> {
     sample_rate: P,
-    components: Vec<PeriodicFunction>,
+    components: Vec<PeriodicFunction<P>>,
     _phantom: PhantomData<T>,
 }
 
-impl<T: SampleType, P: FloatCore> Waveform<T, P> {
+impl<T: SampleType, P: Precision> Waveform<T, P> {
     /// Initializes new empty [Waveform]
     ///
     /// # Panics
@@ -55,7 +56,10 @@ impl<T: SampleType, P: FloatCore> Waveform<T, P> {
     ///
     /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
     /// ```
-    pub fn with_components(sample_rate: impl Into<P>, components: Vec<PeriodicFunction>) -> Self {
+    pub fn with_components(
+        sample_rate: impl Into<P>,
+        components: Vec<PeriodicFunction<P>>,
+    ) -> Self {
         let sample_rate = sample_rate.into();
         Self::assert_sane(sample_rate);
 
@@ -79,7 +83,7 @@ impl<T: SampleType, P: FloatCore> Waveform<T, P> {
     ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
-    pub fn add_component(&mut self, component: PeriodicFunction) {
+    pub fn add_component(&mut self, component: PeriodicFunction<P>) {
         self.components.push(component);
     }
 
@@ -137,7 +141,7 @@ impl<T: SampleType, P: FloatCore> Waveform<T, P> {
     }
 }
 
-impl<'a, T: SampleType, P: FloatCore> IntoIterator for &'a Waveform<T, P> {
+impl<'a, T: SampleType, P: Precision> IntoIterator for &'a Waveform<T, P> {
     type Item = T;
 
     type IntoIter = WaveformIterator<'a, T, P>;
@@ -151,19 +155,19 @@ impl<'a, T: SampleType, P: FloatCore> IntoIterator for &'a Waveform<T, P> {
 }
 
 #[derive(Clone, Copy)]
-pub struct WaveformIterator<'a, T: SampleType, P: FloatCore> {
+pub struct WaveformIterator<'a, T: SampleType, P: Precision> {
     inner: &'a Waveform<T, P>,
     time: P,
 }
 
-impl<'a, T: SampleType, P: FloatCore> WaveformIterator<'a, T, P> {
-    fn into_target_type_sanitized(sample: f64) -> Option<T> {
+impl<'a, T: SampleType, P: Precision> WaveformIterator<'a, T, P> {
+    fn into_target_type_sanitized(sample: P) -> Option<T> {
         let result = NumCast::from(sample);
 
         result.or_else(|| {
-            if sample > 0.0 {
+            if sample > P::zero() {
                 Some(T::max_value())
-            } else if sample < 0.0 {
+            } else if sample < P::zero() {
                 Some(T::min_value())
             } else {
                 None
@@ -171,32 +175,38 @@ impl<'a, T: SampleType, P: FloatCore> WaveformIterator<'a, T, P> {
         })
     }
 
-    fn increment_time(&mut self, n: usize) {
-        let new_time = self.time + (n as f64 * (1.0 / self.inner.sample_rate));
+    fn increment_time(&mut self, n: usize) -> Result<(), ()> {
+        let new_time = self.time + (P::from(n).ok_or(())? * (P::one() / self.inner.sample_rate));
         if new_time.is_finite() {
             self.time = new_time;
         } else {
             self.time = (P::one() / self.inner.sample_rate) - (P::max_value() - self.time);
         }
+
+        Ok(())
     }
 
-    fn raw_sample(&self) -> f64 {
-        self.inner.components.iter().map(|x| x(self.time)).sum()
+    fn raw_sample(&self) -> P {
+        self.inner
+            .components
+            .iter()
+            .map(|x| x.sample(self.time))
+            .sum()
     }
 }
 
-impl<'a, T: SampleType, P: FloatCore> Iterator for WaveformIterator<'a, T, P> {
+impl<'a, T: SampleType, P: Precision> Iterator for WaveformIterator<'a, T, P> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let sample: f64 = self.raw_sample();
-        self.increment_time(1);
+        let sample = self.raw_sample();
+        self.increment_time(1).ok()?;
 
         Self::into_target_type_sanitized(sample)
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.increment_time(n);
+        self.increment_time(n).ok()?;
 
         self.next()
     }
@@ -240,7 +250,7 @@ mod tests {
 
     #[test]
     fn sine_waveform_with_bias_has_correct_amplitude() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5)]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5, f64)]);
 
         let samples = wf.iter().take(100).collect::<Vec<_>>();
 
@@ -283,7 +293,7 @@ mod tests {
 
     #[test]
     fn oversaturated_amplitude_clips_to_max() {
-        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(300)]);
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(300, f64)]);
         let samples = wf.iter().take(1).collect::<Vec<_>>();
 
         assert_eq!(samples.len(), 1);
@@ -292,7 +302,7 @@ mod tests {
 
     #[test]
     fn undersaturated_amplitude_clips_to_min() {
-        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(-300)]);
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(-300, f64)]);
         let samples = wf.iter().take(1).collect::<Vec<_>>();
 
         assert_eq!(samples.len(), 1);
@@ -347,7 +357,7 @@ mod tests {
     fn test_size_hint() {
         test_size_hint!();
         test_size_hint!(sine!(50));
-        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4));
+        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4, f64));
     }
 
     #[test]
