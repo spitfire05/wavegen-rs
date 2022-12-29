@@ -73,7 +73,7 @@
 //!
 //! # Calculation precision
 //!
-//! By default, all calculations in `Waveform` use single floating point precision `f32`. This can be set to `f64` if needed, possibly in case of very high frequencies. To do so, set the `P` type parameter to `f64`:
+//! By default, all calculations in [`Waveform`] use single floating point precision [`f32`]. This can be set to [`f64`] if needed, possibly in case of very high frequencies. To do so, set the `P` type parameter to [`f64`]:
 //!
 //! ```
 //! let double_precision_waveform = wavegen::Waveform::<f64, f64>::new(1e100);
