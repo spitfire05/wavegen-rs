@@ -14,7 +14,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// # Examples
     ///
     /// ```
-    /// let _ = wavegen::PeriodicFunction::new(Box::new(|x| x.cos()));
+    /// let _ = wavegen::PeriodicFunction::new(Box::new(|x: f32| x.cos()));
     /// ```
     pub fn new(f: Box<dyn Fn(P) -> P + Send + Sync>) -> Self {
         Self { inner: f }
@@ -25,7 +25,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// # Examples
     ///
     /// ```
-    /// let _ = wavegen::PeriodicFunction::new(|x| x.cos());
+    /// let _ = wavegen::PeriodicFunction::custom(|x: f32| x.cos());
     /// ```
     pub fn custom<F: Fn(P) -> P + Send + Sync + 'static>(f: F) -> Self {
         Self::new(Box::new(f))

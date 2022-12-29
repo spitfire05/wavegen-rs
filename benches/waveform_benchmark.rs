@@ -4,12 +4,7 @@ use wavegen::{dc_bias, sawtooth, sine, square, Waveform};
 fn sample_waveform_single(n: usize) -> Vec<f64> {
     let wf = Waveform::<f64, f32>::with_components(
         44100.0,
-        vec![
-            sine!(2048.),
-            sawtooth!(1024.),
-            square!(512.),
-            dc_bias!(0.1, f32),
-        ],
+        vec![sine!(2048.), sawtooth!(1024.), square!(512.), dc_bias!(0.1)],
     );
 
     wf.iter().take(n).collect::<Vec<f64>>()
@@ -18,12 +13,7 @@ fn sample_waveform_single(n: usize) -> Vec<f64> {
 fn sample_waveform_double(n: usize) -> Vec<f64> {
     let wf = Waveform::<f64, f64>::with_components(
         44100.0,
-        vec![
-            sine!(2048.),
-            sawtooth!(1024.),
-            square!(512.),
-            dc_bias!(0.1, f64),
-        ],
+        vec![sine!(2048.), sawtooth!(1024.), square!(512.), dc_bias!(0.1)],
     );
 
     wf.iter().take(n).collect::<Vec<f64>>()

@@ -54,7 +54,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
     /// ```
     /// use wavegen::{Waveform, sine, dc_bias};
     ///
-    /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
+    /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1.), dc_bias!(-50.)]);
     /// ```
     pub fn with_components(
         sample_rate: impl Into<P>,
@@ -78,8 +78,8 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
     /// use wavegen::{Waveform, sine, dc_bias};
     ///
     /// let mut wf = Waveform::<f32>::new(100.0);
-    /// wf.add_component(sine!(10));
-    /// wf.add_component(dc_bias!(5));
+    /// wf.add_component(sine!(10.));
+    /// wf.add_component(dc_bias!(5.));
     ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
@@ -96,7 +96,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
     ///
     /// let wf = Waveform::<f32>::new(42.0);
     ///
-    /// assert_eq!(42.0, wf.get_sample_rate());
+    /// assert_eq!(42.0, *wf.sample_rate());
     /// ```
     pub fn sample_rate(&self) -> &P {
         &self.sample_rate
@@ -109,7 +109,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
     /// ```
     /// use wavegen::{Waveform, sine, dc_bias};
     ///
-    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1), dc_bias!(5)]);
+    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1.), dc_bias!(5.)]);
     ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
@@ -124,7 +124,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
     /// ```
     /// use wavegen::{Waveform, sine};
     ///
-    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1)]);
+    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1.)]);
     /// let samples = wf.iter().take(100).collect::<Vec<_>>();
     /// ```
     pub fn iter(&self) -> WaveformIterator<T, P> {

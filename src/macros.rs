@@ -2,7 +2,7 @@
 ///
 /// # Double precision
 ///
-/// This macro does **not** support creating double precision waveforms. Use the [`Waveform`] methods directly in cse you need it.
+/// This macro does **not** support creating double precision waveforms. Use the [`Waveform`] methods directly in case you need it.
 ///
 /// # Panics
 ///
@@ -13,13 +13,13 @@
 /// ```
 /// use wavegen::{wf, sine, square};
 ///
-/// let empty_waveform = wf!(f32, 16000);
+/// let empty_waveform = wf!(f32, 16000.);
 /// assert_eq!(0, empty_waveform.get_components_len());
 ///
-/// let sine_waveform = wf!(f64, 44100, sine!(50));
+/// let sine_waveform = wf!(f64, 44100., sine!(50.));
 /// assert_eq!(1, sine_waveform.get_components_len());
 ///
-/// let some_other_waveform = wf!(i64, 22000, sine!(100), square!(200));
+/// let some_other_waveform = wf!(i64, 22000., sine!(100.), square!(200.));
 /// assert_eq!(2, some_other_waveform.get_components_len());
 /// ```
 ///
@@ -47,19 +47,17 @@ macro_rules! wf {
 ///
 /// Defines bias of amplitude +10
 /// ```
-/// let bias = wavegen::dc_bias!(10);
+/// let bias: wavegen::PeriodicFunction<f32> = wavegen::dc_bias!(10.);
 ///
-/// assert!((0..100000).all(|x| bias(x.into()) == 10.0))
+/// assert!((0..1000i16).all(|x| bias.sample(x.into()) == 10.0))
 /// ```
 ///
 /// [`PeriodicFunction`]: type.periodicfunction.html
+/// [`Waveform`]: type.waveform.html
 #[macro_export]
 macro_rules! dc_bias {
     ($bias:expr) => {
-        $crate::dc_bias!($bias, f32)
-    };
-    ($bias:expr, $t:ty) => {
-        $crate::PeriodicFunction::<$t>::dc_bias($bias)
+        $crate::PeriodicFunction::dc_bias($bias)
     };
 }
 
@@ -110,17 +108,17 @@ macro_rules! sawtooth {
 ///
 /// 50 Hz sine of amplitude 1 and no phase shift
 /// ```
-/// let sine = wavegen::sine!(50);
+/// let sine: wavegen::PeriodicFunction<f32> = wavegen::sine!(50.);
 /// ```
 ///
 /// 50 Hz sine of amplitude 20 and no phase shift
 /// ```
-/// let sine = wavegen::sine!(frequency: 50, amplitude: 20);
+/// let sine: wavegen::PeriodicFunction<f32> = wavegen::sine!(frequency: 50., amplitude: 20.);
 /// ```
 ///
 /// 50 Hz sine of amplitude 20 and phase shift of half a turn
 /// ```
-/// let sine = wavegen::sine!(50, 20, 0.5);
+/// let sine: wavegen::PeriodicFunction<f32> = wavegen::sine!(50.   , 20., 0.5);
 /// ```
 ///
 /// [`PeriodicFunction`]: type.periodicfunction.html
@@ -183,6 +181,8 @@ macro_rules! square {
 mod tests {
     use float_cmp::approx_eq;
 
+    use crate::PeriodicFunction;
+
     const EPS: f64 = 1e-3;
 
     #[test]
@@ -205,7 +205,7 @@ mod tests {
     #[test]
     fn dc_bias_is_const_for_any_input() {
         let y = 42.0;
-        let dc = dc_bias!(y, f64);
+        let dc: PeriodicFunction<f64> = dc_bias!(y);
         for x in (0..10000000).map(|x| x.into()) {
             assert_eq!(dc.sample(x), y);
         }

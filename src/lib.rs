@@ -7,7 +7,7 @@
 //!
 //! // Define a Waveform with 200Hz sampling rate and three function components,
 //! // choosing f32 as the output type:
-//! let waveform = wf!(f32, 200, sine!(50, 10), sawtooth!(20), dc_bias!(-5));
+//! let waveform = wf!(f32, 200., sine!(50., 10.), sawtooth!(20.), dc_bias!(-5.));
 //!
 //! // Use Waveform as an infinite iterator:
 //! let two_seconds_of_samples: Vec<f32> = waveform.iter().take(400).collect();
@@ -24,15 +24,15 @@
 //!
 //! They come in an annotated and non-annotated form, so for example a Sine function can be expressed in both ways:
 //! ```
-//! use wavegen::sine;
+//! use wavegen::{wf, sine, PeriodicFunction};
 //!
-//! let sine_f = sine!(100, 20, 0.25);
+//! let _: PeriodicFunction<f32> = sine!(100., 20., 0.25);
 //! ```
 //!
 //! ```
-//! use wavegen::sine;
+//! use wavegen::{wf, sine, PeriodicFunction};
 //!
-//! let sine_f = sine!(frequency: 100, amplitude: 20, phase: 0.25);
+//! let _: PeriodicFunction<f32> = sine!(frequency: 100., amplitude: 20., phase: 0.25);
 //! ```
 //!
 //! Refer to Macros section for more info.
@@ -41,9 +41,9 @@
 //! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
 //!
 //! ```
-//! use wavegen::{wf, periodic_functions::custom};
+//! use wavegen::{wf, PeriodicFunction};
 //!
-//! let waveform = wf!(f64, 100.0, custom(|x| x % 2.0));
+//! let waveform = wf!(f64, 100.0, PeriodicFunction::custom(|x| x % 2.0));
 //! ```
 //!
 //! # Overflows
@@ -56,7 +56,7 @@
 //! ```
 //! use wavegen::{Waveform, dc_bias};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]);
+//! let wf = Waveform::<f64>::with_components(100.0, vec![dc_bias![f32::MAX], dc_bias![f32::MAX]]);
 //! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
 //!
 //! assert_eq!(sample, f64::INFINITY);
@@ -65,10 +65,18 @@
 //! ```
 //! use wavegen::{Waveform, dc_bias};
 //!
-//! let wf = Waveform::<i32>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]);
+//! let wf = Waveform::<i32>::with_components(100.0, vec![dc_bias![f32::MAX], dc_bias![f32::MAX]]);
 //! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
 //!
 //! assert_eq!(sample, i32::MAX);
+//! ```
+//!
+//! # Calculation precision
+//!
+//! By default, all calculations in `Waveform` use single floating point precision `f32`. This can be set to `f64` if needed, possibly in case of very high frequencies. To do so, set the `P` type parameter to `f64`:
+//!
+//! ```
+//! let double_precision_waveform = wavegen::Waveform::<f64, f64>::new(1e100);
 //! ```
 //!
 //! # Iterator infinity
@@ -79,20 +87,20 @@
 //!
 //! `f64::NAN` cannot be represented as `i32`:
 //! ```
-//! use wavegen::{Waveform, dc_bias};
+//! use wavegen::{Waveform, PeriodicFunction};
 //!
-//! let mut wf = Waveform::<i32>::new(100.0);
-//! wf.add_component(dc_bias!(f64::NAN));
+//! let mut wf = Waveform::<i32, f64>::new(100.0);
+//! wf.add_component(PeriodicFunction::dc_bias(f64::NAN));
 //!
 //! assert_eq!(None, wf.iter().next())
 //! ```
 //!
 //! This however is fine, as `f64::NAN` can be represented as `f32::NAN`:
 //! ```
-//! use wavegen::{Waveform, dc_bias};
+//! use wavegen::{Waveform, PeriodicFunction};
 //!
-//! let mut wf = Waveform::<f32>::new(100.0);
-//! wf.add_component(dc_bias!(f64::NAN));
+//! let mut wf = Waveform::<f32, f64>::new(100.0);
+//! wf.add_component(PeriodicFunction::dc_bias(f64::NAN));
 //!
 //! assert!(wf.iter().next().unwrap().is_nan())
 //! ```
@@ -109,7 +117,7 @@
 //! use wavegen::{Waveform, sine};
 //!
 //! // 100 Hz sampling of 80 Hz sine... will not yield realistic results.
-//! let wf = Waveform::<f32>::with_components(100.0, vec![sine!(80)]);
+//! let wf = Waveform::<f32>::with_components(100.0, vec![sine!(80.)]);
 //! ```
 //!
 //! As it is often a case, it is you, the programmer, who's left in charge of making sure the input data makes sense.
