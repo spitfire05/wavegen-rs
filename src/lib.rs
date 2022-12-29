@@ -7,7 +7,7 @@
 //!
 //! // Define a Waveform with 200Hz sampling rate and three function components,
 //! // choosing f32 as the output type:
-//! let waveform = wf!(f32, 200, sine!(50, 10), sawtooth!(20), dc_bias!(-5));
+//! let waveform = wf!(f32, 200, sine!(50, 10), sawtooth!(20), dc_bias!(-5)).unwrap();
 //!
 //! // Use Waveform as an infinite iterator:
 //! let two_seconds_of_samples: Vec<f32> = waveform.iter().take(400).collect();
@@ -43,7 +43,7 @@
 //! ```
 //! use wavegen::{wf, periodic_functions::custom};
 //!
-//! let waveform = wf!(f64, 100.0, custom(|x| x % 2.0));
+//! let waveform = wf!(f64, 100.0, custom(|x| x % 2.0)).unwrap();
 //! ```
 //!
 //! # Overflows
@@ -56,7 +56,7 @@
 //! ```
 //! use wavegen::{Waveform, dc_bias};
 //!
-//! let wf = Waveform::<f64>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]);
+//! let wf = Waveform::<f64>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]).unwrap();
 //! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
 //!
 //! assert_eq!(sample, f64::INFINITY);
@@ -65,7 +65,7 @@
 //! ```
 //! use wavegen::{Waveform, dc_bias};
 //!
-//! let wf = Waveform::<i32>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]);
+//! let wf = Waveform::<i32>::with_components(100.0, vec![dc_bias![f64::MAX], dc_bias![f64::MAX]]).unwrap();
 //! let sample = wf.iter().take(1).collect::<Vec<_>>()[0];
 //!
 //! assert_eq!(sample, i32::MAX);
@@ -81,7 +81,7 @@
 //! ```
 //! use wavegen::{Waveform, dc_bias};
 //!
-//! let mut wf = Waveform::<i32>::new(100.0);
+//! let mut wf = Waveform::<i32>::new(100.0).unwrap();
 //! wf.add_component(dc_bias!(f64::NAN));
 //!
 //! assert_eq!(None, wf.iter().next())
@@ -91,7 +91,7 @@
 //! ```
 //! use wavegen::{Waveform, dc_bias};
 //!
-//! let mut wf = Waveform::<f32>::new(100.0);
+//! let mut wf = Waveform::<f32>::new(100.0).unwrap();
 //! wf.add_component(dc_bias!(f64::NAN));
 //!
 //! assert!(wf.iter().next().unwrap().is_nan())
@@ -101,15 +101,15 @@
 //!
 //! # Note about Nyquist-Shannon rule enforcement
 //!
-//! As a rule of thumb in signal processing, the sampling frequency should be *at least* 2 times bigger than the highest frequency of sampled continous signal.
+//! As a rule of thumb in signal processing, the sampling frequency should be *at least* 2 times bigger than the highest frequency of sampled continuos signal.
 //!
-//! This lib will **not** enforce the Nyquist-Shannon rule on the waveforms you create, therefore abominations like this are possible (altough not recommended):
+//! This lib will **not** enforce the Nyquist-Shannon rule on the waveforms you create, therefore abominations like this are possible (although not recommended):
 //!
 //! ```
 //! use wavegen::{Waveform, sine};
 //!
 //! // 100 Hz sampling of 80 Hz sine... will not yield realistic results.
-//! let wf = Waveform::<f32>::with_components(100.0, vec![sine!(80)]);
+//! let wf = Waveform::<f32>::with_components(100.0, vec![sine!(80)]).unwrap();
 //! ```
 //!
 //! As it is often a case, it is you, the programmer, who's left in charge of making sure the input data makes sense.
@@ -129,11 +129,13 @@ extern crate alloc;
 
 pub mod periodic_functions;
 
+mod errors;
 mod macros;
 mod waveform;
 
 use alloc::boxed::Box;
 
+pub use errors::InvalidSampleRate;
 pub use waveform::SampleType;
 pub use waveform::Waveform;
 

@@ -9,21 +9,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "sine.png",
         "Sine",
-        wf!(f32, sample_rate, sine!(1)),
+        wf!(f32, sample_rate, sine!(1))?,
     )?;
 
     draw(
         sample_rate,
         "sine_double.png",
         "Sines",
-        wf!(f32, sample_rate, sine!(1.0), sine!(1.0, 1.0, 0.25)),
+        wf!(f32, sample_rate, sine!(1.0), sine!(1.0, 1.0, 0.25))?,
     )?;
 
     draw(
         sample_rate,
         "sawtooth.png",
         "Sawtooth",
-        wf!(f32, sample_rate, sawtooth!(2, 1, 0.0)),
+        wf!(f32, sample_rate, sawtooth!(2, 1, 0.0))?,
     )?;
 
     draw(
@@ -35,14 +35,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             sample_rate,
             sawtooth!(2, 1, 0.0),
             sine!(frequency: 50, amplitude: 0.1)
-        ),
+        )?,
     )?;
 
     draw(
         sample_rate,
         "square.png",
         "Square",
-        wf!(f32, sample_rate, square!(2)),
+        wf!(f32, sample_rate, square!(2))?,
     )?;
 
     draw(
@@ -55,7 +55,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             sine!(10, 0.3),
             sawtooth!(2, 0.3),
             square!(3, 0.3)
-        ),
+        )?,
     )?;
 
     draw(
@@ -67,7 +67,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             sample_rate,
             sine!(frequency: 300),
             sine!(frequency: 50, amplitude: 0.3)
-        ),
+        )?,
     )?;
 
     Ok(())
@@ -117,6 +117,8 @@ fn draw_internal<I: IntoIterator<Item = (f32, f32)>, P: AsRef<Path>>(
         .background_style(WHITE.mix(0.8))
         .border_style(BLACK)
         .draw()?;
+
+    root.present()?;
 
     Ok(())
 }

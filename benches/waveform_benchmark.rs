@@ -5,7 +5,8 @@ fn sample_waveform(n: usize) -> Vec<f64> {
     let wf = Waveform::with_components(
         44100.0,
         vec![sine!(2048), sawtooth!(1024), square!(512), dc_bias!(0.1)],
-    );
+    )
+    .unwrap();
 
     wf.iter().take(n).collect::<Vec<f64>>()
 }

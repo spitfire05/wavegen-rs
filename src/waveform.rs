@@ -1,14 +1,14 @@
-use crate::PeriodicFunction;
+use crate::{InvalidSampleRate, PeriodicFunction};
 use alloc::{vec, vec::Vec};
 use core::marker::PhantomData;
 use num_traits::{Bounded, NumCast};
 
-/// Helper trait defining all the types that can be used as [Waveform]'s sample type.
+/// Helper trait defining all the types that can be used as [`Waveform`]'s sample type.
 pub trait SampleType: NumCast + Bounded {}
 
 impl<T> SampleType for T where T: NumCast + Bounded {}
 
-/// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
+/// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [`PeriodicFunction`]s.
 pub struct Waveform<T: SampleType> {
     sample_rate: f64,
     components: Vec<PeriodicFunction>,
@@ -16,64 +16,67 @@ pub struct Waveform<T: SampleType> {
 }
 
 impl<T: SampleType> Waveform<T> {
-    /// Initializes new empty [Waveform]
+    /// Initializes new empty [`Waveform`].
     ///
-    /// # Panics
-    ///
-    /// This method will panic if `sample_rate` is not a finite, positive, non-zero number.
+    /// Will return [`InvalidSampleRate`] error, if the `sample_rate` value is not a finite, positive, non-zero number.
     ///
     /// # Examples
     ///
     /// ```
     /// use wavegen::Waveform;
     ///
-    /// let wf = Waveform::<f32>::new(500.0);
+    /// let wf = Waveform::<f32>::new(500.0).unwrap();
     ///
     /// assert!(wf.iter().take(100).all(|y| y == 0.0));
     /// ```
-    pub fn new(sample_rate: impl Into<f64>) -> Self {
+    pub fn new(sample_rate: impl Into<f64>) -> Result<Self, InvalidSampleRate> {
         let sample_rate = sample_rate.into();
-        Self::assert_sane(sample_rate);
+        if !Self::sane_sample_rate(sample_rate) {
+            return Err(InvalidSampleRate(sample_rate));
+        }
 
-        Waveform {
+        Ok(Waveform {
             sample_rate,
             components: vec![],
             _phantom: PhantomData,
-        }
+        })
     }
 
-    /// Initializes new [Waveform] with predefined components
+    /// Initializes new [`Waveform`] with predefined components.
     ///
-    /// # Panics
-    ///
-    /// This method will panic if `sample_rate` is not a finite, positive, non-zero number.
+    /// Will return [`InvalidSampleRate`] error, if the `sample_rate` value is not a finite, positive, non-zero number.
     ///
     /// # Examples
     ///
     /// ```
     /// use wavegen::{Waveform, sine, dc_bias};
     ///
-    /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]);
+    /// let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(-50)]).unwrap();
     /// ```
-    pub fn with_components(sample_rate: impl Into<f64>, components: Vec<PeriodicFunction>) -> Self {
+    pub fn with_components(
+        sample_rate: impl Into<f64>,
+        components: Vec<PeriodicFunction>,
+    ) -> Result<Self, InvalidSampleRate> {
         let sample_rate = sample_rate.into();
-        Self::assert_sane(sample_rate);
+        if !Self::sane_sample_rate(sample_rate) {
+            return Err(InvalidSampleRate(sample_rate));
+        }
 
-        Waveform {
+        Ok(Waveform {
             sample_rate,
             components,
             _phantom: PhantomData,
-        }
+        })
     }
 
-    /// Ads a new component to existing [Waveform].
+    /// Ads a new component to existing [`Waveform``].
     ///
     /// # Examples
     ///
     /// ```
     /// use wavegen::{Waveform, sine, dc_bias};
     ///
-    /// let mut wf = Waveform::<f32>::new(100.0);
+    /// let mut wf = Waveform::<f32>::new(100.0).unwrap();
     /// wf.add_component(sine!(10));
     /// wf.add_component(dc_bias!(5));
     ///
@@ -83,14 +86,14 @@ impl<T: SampleType> Waveform<T> {
         self.components.push(component);
     }
 
-    /// Getter for sample rate of a [Waveform].
+    /// Getter for sample rate of a [`Waveform`].
     ///
     /// # Examples
     ///
     /// ```
     /// use wavegen::Waveform;
     ///
-    /// let wf = Waveform::<f32>::new(42.0);
+    /// let wf = Waveform::<f32>::new(42.0).unwrap();
     ///
     /// assert_eq!(42.0, wf.get_sample_rate());
     /// ```
@@ -98,14 +101,14 @@ impl<T: SampleType> Waveform<T> {
         self.sample_rate
     }
 
-    /// Returns number of components this [Waveform] consists of.
+    /// Returns number of components this [`Waveform`] consists of.
     ///
     /// # Examples
     ///
     /// ```
     /// use wavegen::{Waveform, sine, dc_bias};
     ///
-    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1), dc_bias!(5)]);
+    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1), dc_bias!(5)]).unwrap();
     ///
     /// assert_eq!(2, wf.get_components_len());
     /// ```
@@ -113,14 +116,14 @@ impl<T: SampleType> Waveform<T> {
         self.components.len()
     }
 
-    /// Returns an iterator over this [Waveform] samples.
+    /// Returns an iterator over this [`Waveform`] samples.
     ///
     /// # Examples
     ///
     /// ```
     /// use wavegen::{Waveform, sine};
     ///
-    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1)]);
+    /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1)]).unwrap();
     /// let samples = wf.iter().take(100).collect::<Vec<_>>();
     /// ```
     pub fn iter(&self) -> WaveformIterator<T> {
@@ -131,9 +134,8 @@ impl<T: SampleType> Waveform<T> {
     }
 
     #[inline(always)]
-    fn assert_sane(x: f64) {
-        assert!(x.is_normal());
-        assert!(x.is_sign_positive());
+    fn sane_sample_rate(x: f64) -> bool {
+        x.is_normal() && x.is_sign_positive()
     }
 }
 
@@ -208,19 +210,19 @@ impl<'a, T: SampleType> Iterator for WaveformIterator<'a, T> {
 
 #[cfg(test)]
 mod tests {
-    use alloc::{vec, vec::Vec};
-
-    use float_cmp::approx_eq;
-    use paste::paste;
+    #![allow(clippy::unwrap_used)]
 
     use super::Waveform;
     use crate::{dc_bias, sawtooth, sine, square};
+    use alloc::{vec, vec::Vec};
+    use float_cmp::approx_eq;
+    use paste::paste;
 
     const EPS: f32 = 1e-3;
 
     #[test]
     fn sine_waveform_has_default_amplitude_of_one() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1)]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1)]).unwrap();
 
         let samples = wf.iter().take(100).collect::<Vec<_>>();
 
@@ -230,7 +232,7 @@ mod tests {
 
     #[test]
     fn sine_waveform_as_integers_has_amplitude_of_one() {
-        let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1)]);
+        let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1)]).unwrap();
 
         let samples = wf.iter().take(100).collect::<Vec<_>>();
 
@@ -240,7 +242,7 @@ mod tests {
 
     #[test]
     fn sine_waveform_with_bias_has_correct_amplitude() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5)]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5)]).unwrap();
 
         let samples = wf.iter().take(100).collect::<Vec<_>>();
 
@@ -254,7 +256,7 @@ mod tests {
                 paste! {
                     #[test]
                     fn [<default_ $name _waveforom_has_no_bias>]() {
-                        let wf = Waveform::<f32>::with_components(100.0, vec![$func]);
+                        let wf = Waveform::<f32>::with_components(100.0, vec![$func]).unwrap();
 
                         let bias = wf.iter().take(100).sum::<f32>() / 100.0;
 
@@ -274,7 +276,7 @@ mod tests {
     #[test]
     #[allow(clippy::iter_skip_next)]
     fn waveform_iterator_is_infinite() {
-        let wf = Waveform::<f64>::new(f64::MIN_POSITIVE);
+        let wf = Waveform::<f64>::new(f64::MIN_POSITIVE).unwrap();
         let mut iter = wf.iter().skip(usize::MAX);
 
         assert_eq!(Some(0f64), iter.next());
@@ -283,7 +285,7 @@ mod tests {
 
     #[test]
     fn oversaturated_amplitude_clips_to_max() {
-        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(300)]);
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(300)]).unwrap();
         let samples = wf.iter().take(1).collect::<Vec<_>>();
 
         assert_eq!(samples.len(), 1);
@@ -292,36 +294,34 @@ mod tests {
 
     #[test]
     fn undersaturated_amplitude_clips_to_min() {
-        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(-300)]);
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(-300)]).unwrap();
         let samples = wf.iter().take(1).collect::<Vec<_>>();
 
         assert_eq!(samples.len(), 1);
         assert_eq!(samples[0], u8::MIN);
     }
 
-    macro_rules! test_wavefrom_panic {
+    macro_rules! test_waveform_err {
         ($($name:ident: $sample_rate:expr)*) => {
             $(
                 paste! {
                     #[test]
-                    #[should_panic]
                     fn [<waveform_new_panics_on_ $name>]() {
 
-                        Waveform::<f64>::new($sample_rate);
+                        assert!(Waveform::<f64>::new($sample_rate).is_err());
                     }
 
 
                     #[test]
-                    #[should_panic]
                     fn [<waveform_with_components_panics_on_ $name>]() {
-                        Waveform::<f64>::with_components($sample_rate, vec![]);
+                        assert!(Waveform::<f64>::with_components($sample_rate, vec![]).is_err());
                     }
                 }
             )*
         };
     }
 
-    test_wavefrom_panic! {
+    test_waveform_err! {
         nan: f64::NAN
         negative: -1f64
         zero: 0.0
@@ -331,11 +331,11 @@ mod tests {
 
     macro_rules! test_size_hint {
         () => {
-            let wf = Waveform::<f32>::new(44100.0);
+            let wf = Waveform::<f32>::new(44100.0).unwrap();
             assert_eq!((usize::MAX, None), wf.iter().size_hint());
         };
         ($($component:expr),*) => {
-            let mut wf = Waveform::<f32>::new(44100.0);
+            let mut wf = Waveform::<f32>::new(44100.0).unwrap();
             $(
                 wf.add_component($component);
             )*
@@ -354,7 +354,7 @@ mod tests {
     #[allow(clippy::iter_nth_zero)]
     #[allow(clippy::unwrap_used)]
     fn nth_and_next_give_same_results() {
-        let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
+        let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]).unwrap();
         let mut i1 = wf.iter();
         let mut i2 = wf.iter();
 
