@@ -81,7 +81,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
     /// wf.add_component(sine!(10.));
     /// wf.add_component(dc_bias!(5.));
     ///
-    /// assert_eq!(2, wf.get_components_len());
+    /// assert_eq!(2, wf.components().len());
     /// ```
     pub fn add_component(&mut self, component: PeriodicFunction<P>) {
         self.components.push(component);
@@ -102,7 +102,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
         &self.sample_rate
     }
 
-    /// Returns number of components this [Waveform] consists of.
+    /// Returns list of components this [`Waveform`] consists of.
     ///
     /// # Examples
     ///
@@ -111,10 +111,10 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
     ///
     /// let wf = Waveform::<f32>::with_components(42.0, vec![sine!(1.), dc_bias!(5.)]);
     ///
-    /// assert_eq!(2, wf.get_components_len());
+    /// assert_eq!(2, wf.components().len());
     /// ```
-    pub fn get_components_len(&self) -> usize {
-        self.components.len()
+    pub fn components(&self) -> &Vec<PeriodicFunction<P>> {
+        &self.components
     }
 
     /// Returns an iterator over this [Waveform] samples.
