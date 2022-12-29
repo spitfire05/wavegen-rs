@@ -75,7 +75,7 @@ All above examples are generated with simple program found in `examples/plot.rs`
 
 ## MSRV
 
-The *Minimum Supported Rust Version* is `1.56.1`.
+The *Minimum Supported Rust Version* is `1.60`.
 
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
