@@ -38,7 +38,7 @@
 //! Refer to Macros section for more info.
 //!
 //! # Custom periodic functions
-//! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [Waveform].
+//! Supported, of course. Just define your custom function as `Box<Fn(f64) -> f64>` and use it with [`Waveform`].
 //!
 //! ```
 //! use wavegen::{wf, PeriodicFunction};
@@ -48,7 +48,7 @@
 //!
 //! # Overflows
 //!
-//! As [Waveform] can be composed of multiple components, it is possible for it to overflow during samples collection.
+//! As [`Waveform`] can be composed of multiple components, it is possible for it to overflow during samples collection.
 //! If overflow occurs, the sample's value will be clamped to the largest possible representation of sample's type.
 //!
 //! That means `+/- Inf` for floating point types, and `MAX/MIN` for integers.
@@ -143,7 +143,7 @@ use core::marker::PhantomData;
 use core::ops::Add;
 use num_traits::{Bounded, Float, FloatConst, NumCast, One};
 
-/// Defines precision of inner [`Waveform`] and `[PeriodicFunction`] calcualtions.
+/// Defines precision of inner [`Waveform`] and [`PeriodicFunction`] calcualtions.
 pub trait Precision: Float + FloatConst + Sum + Send + Sync + 'static {}
 
 impl<T> Precision for T where T: Float + FloatConst + Sum + Send + Sync + 'static {}
@@ -162,12 +162,12 @@ where
     }
 }
 
-/// Helper trait defining all the types that can be used as [Waveform]'s sample type.
+/// Helper trait defining all the types that can be used as [`Waveform`]'s sample type.
 pub trait SampleType: NumCast + Bounded {}
 
 impl<T> SampleType for T where T: NumCast + Bounded {}
 
-/// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
+/// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [`PeriodicFunction`]s.
 pub struct Waveform<T: SampleType, P: Precision = f32> {
     sample_rate: P,
     components: Vec<PeriodicFunction<P>>,
@@ -175,7 +175,7 @@ pub struct Waveform<T: SampleType, P: Precision = f32> {
 }
 
 impl<T: SampleType, P: Precision> Waveform<T, P> {
-    /// Initializes new empty [Waveform]
+    /// Initializes new empty [`Waveform`]
     ///
     /// # Panics
     ///
@@ -201,7 +201,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
         }
     }
 
-    /// Initializes new [Waveform] with predefined components
+    /// Initializes new [`Waveform`] with predefined components
     ///
     /// # Panics
     ///
@@ -228,7 +228,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
         }
     }
 
-    /// Ads a new component to existing [Waveform].
+    /// Ads a new component to existing [`Waveform`].
     ///
     /// # Examples
     ///
@@ -275,7 +275,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
         &self.components
     }
 
-    /// Returns an iterator over this [Waveform] samples.
+    /// Returns an iterator over this [`Waveform`] samples.
     ///
     /// # Examples
     ///
