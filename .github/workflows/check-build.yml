@@ -16,7 +16,7 @@ jobs:
       matrix:
         build_args:
           ["", "--no-default-features --features libm", "--features libm"]
-        toolchain: ["stable", "1.56.1"]
+        toolchain: ["stable", "1.60"]
 
     runs-on: ubuntu-latest
 

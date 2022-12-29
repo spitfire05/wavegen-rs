@@ -3,13 +3,13 @@ use std::path::Path;
 use wavegen::{sawtooth, sine, square, wf, Waveform};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let sample_rate = 800.0;
+    let sample_rate = 800.0f32;
 
     draw(
         sample_rate,
         "sine.png",
         "Sine",
-        wf!(f32, sample_rate, sine!(1)),
+        Waveform::with_components(sample_rate, vec![sine!(1.)]),
     )?;
 
     draw(
@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "sawtooth.png",
         "Sawtooth",
-        wf!(f32, sample_rate, sawtooth!(2, 1, 0.0)),
+        wf!(f32, sample_rate, sawtooth!(2., 1., 0.0)),
     )?;
 
     draw(
@@ -33,8 +33,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         wf!(
             f32,
             sample_rate,
-            sawtooth!(2, 1, 0.0),
-            sine!(frequency: 50, amplitude: 0.1)
+            sawtooth!(2., 1., 0.0),
+            sine!(frequency: 50., amplitude: 0.1)
         ),
     )?;
 
@@ -42,7 +42,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "square.png",
         "Square",
-        wf!(f32, sample_rate, square!(2)),
+        wf!(f32, sample_rate, square!(2.)),
     )?;
 
     draw(
@@ -52,9 +52,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         wf!(
             f32,
             sample_rate,
-            sine!(10, 0.3),
-            sawtooth!(2, 0.3),
-            square!(3, 0.3)
+            sine!(10., 0.3),
+            sawtooth!(2., 0.3),
+            square!(3., 0.3)
         ),
     )?;
 
@@ -65,8 +65,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         wf!(
             f32,
             sample_rate,
-            sine!(frequency: 300),
-            sine!(frequency: 50, amplitude: 0.3)
+            sine!(frequency: 300.),
+            sine!(frequency: 50., amplitude: 0.3)
         ),
     )?;
 
@@ -74,7 +74,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn draw(
-    sample_rate: f64,
+    sample_rate: f32,
     path: impl AsRef<Path>,
     label: impl AsRef<str>,
     waveform: Waveform<f32>,
@@ -85,7 +85,7 @@ fn draw(
         waveform
             .iter()
             .enumerate()
-            .map(|(i, x)| (i as f32 / sample_rate as f32, x))
+            .map(|(i, x)| (i as f32 / sample_rate, x))
             .take(sample_rate as usize),
     )
 }

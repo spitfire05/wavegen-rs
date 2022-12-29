@@ -12,19 +12,19 @@
 
 ```toml
 [dependencies]
-wavegen = "0.3"
+wavegen = "0.4"
 ```
 Or, to use the *no_std* version (custom global allocator is required):
 
 ```toml
 [dependencies]
-wavegen = { version = "0.3", default-features = false, features = ["libm"] }
+wavegen = { version = "0.4", default-features = false, features = ["libm"] }
 ```
 
 2) Define a waveform with sampling frequency and function components:
 
 ```rust
-let waveform = wf!(f64, 200, sine!(frequency: 100, amplitude: 10), dc_bias!(20));
+let waveform = wf!(f64, 200, sine!(frequency: 100., amplitude: 10.), dc_bias!(20.));
 ```
 
 3) Turn it into an iterator and sample:
@@ -75,7 +75,7 @@ All above examples are generated with simple program found in `examples/plot.rs`
 
 ## MSRV
 
-The *Minimum Supported Rust Version* is `1.56.1`.
+The *Minimum Supported Rust Version* is `1.60`.
 
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
@@ -84,4 +84,9 @@ The *Minimum Supported Rust Version* is `1.56.1`.
 
 ### 0.2
 
-0.2 intorduces a braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
+- Braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
+
+### 0.4
+
+- `Waveform::get_sample_rate` renamed to `Waveform::sample_rate` and now returns a borrowed values, as per rust API specs.
+- `Waveform::get_components_len` removed. The functionality can be achieved by a new getter `Waveform::components`.
