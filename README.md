@@ -84,4 +84,9 @@ The *Minimum Supported Rust Version* is `1.56.1`.
 
 ### 0.2
 
-0.2 intorduces a braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
+- Braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
+
+### 0.4
+
+- `Waveform::get_sample_rate` renamed to `Waveform::sample_rate` and now returns a borrowed values, as per rust API specs.
+- `Waveform::get_components_len` removed. The functionality can be achieved by a new getter `Waveform::components`.
