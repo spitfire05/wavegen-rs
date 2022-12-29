@@ -81,11 +81,11 @@
 //!
 //! # Iterator infinity
 //!
-//! `WaveformIterator` is a *mostly* infinite iterator, with one exception:
+//! [`WaveformIterator`] is a *mostly* infinite iterator, with one exception:
 //!
-//! The `WaveformIterator::next()` method can return `None` in some rare cases if it is not able to convert the inner sample type `f64` into the target sample type.
+//! The `WaveformIterator::next` method can return [`None`] in some rare cases if it is not able to convert the inner sample type [`f64`] into the target sample type.
 //!
-//! `f64::NAN` cannot be represented as `i32`:
+//! `f64::NAN` cannot be represented as [`i32`]:
 //! ```
 //! use wavegen::{Waveform, PeriodicFunction};
 //!
