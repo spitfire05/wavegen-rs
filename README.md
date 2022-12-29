@@ -24,7 +24,7 @@ wavegen = { version = "0.4", default-features = false, features = ["libm"] }
 2) Define a waveform with sampling frequency and function components:
 
 ```rust
-let waveform = wf!(f64, 200, sine!(frequency: 100., amplitude: 10.), dc_bias!(20.));
+let waveform = wf!(f64, 200., sine!(frequency: 100., amplitude: 10.), dc_bias!(20.));
 ```
 
 3) Turn it into an iterator and sample:
