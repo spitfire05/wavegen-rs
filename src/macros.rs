@@ -1,5 +1,9 @@
 /// Helper macro to construct [`Waveform`] instance.
 ///
+/// # Double precision
+///
+/// This macro does **not** support creating double precision waveforms. Use the [`Waveform`] methods directly in cse you need it.
+///
 /// # Panics
 ///
 /// This macro will cause panic if sampling rate is not a finite, positive, non-zero number.
@@ -23,15 +27,9 @@
 #[macro_export]
 macro_rules! wf {
     ($sample_type:ty, $sample_rate:expr) => {
-        $crate::wf!($sample_type, $sample_rate, f32)
-    };
-    ($sample_type:ty, $sample_rate:expr, $precision:ty) => {
         $crate::Waveform::<$sample_type>::new($sample_rate)
     };
-    ($sample_type:ty, $sample_rate:expr, $($comp:expr),+) => {
-        $crate::wf!($sample_type, $sample_rate, f32, $($comp,)+)
-    };
-    ($sample_type:ty, $sample_rate:expr, $precision:ty, $($comp:expr),+ $(,)?) => {
+    ($sample_type:ty, $sample_rate:expr, $($comp:expr),+ $(,)?) => {
         {
             extern crate alloc;
             let __wf = $crate::Waveform::<$sample_type>::with_components($sample_rate, alloc::vec![$($comp,)+]);

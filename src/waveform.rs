@@ -1,6 +1,6 @@
-use alloc::{boxed::Box, vec, vec::Vec};
-use core::{iter::Sum, marker::PhantomData};
-use num_traits::{float::FloatCore, Bounded, NumCast};
+use alloc::{vec, vec::Vec};
+use core::marker::PhantomData;
+use num_traits::{Bounded, NumCast};
 
 use crate::{PeriodicFunction, Precision};
 

@@ -9,7 +9,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "sine.png",
         "Sine",
-        wf!(f32, sample_rate, sine!(1)),
+        Waveform::with_components(sample_rate, vec![sine!(1)]),
     )?;
 
     draw(
