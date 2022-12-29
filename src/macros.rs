@@ -187,18 +187,18 @@ mod tests {
 
     #[test]
     fn empty_waveform_has_zero_components() {
-        let wf = wf!(f64, 44100);
+        let wf = wf!(f64, 44100.);
         assert_eq!(0, wf.get_components_len());
     }
 
     #[test]
     fn wavefrom_with_one_component() {
-        let wf = wf!(f64, 44100, sine!(500));
+        let wf = wf!(f64, 44100., sine!(500.));
         assert_eq!(1, wf.get_components_len());
     }
     #[test]
     fn wavefrom_with_three_components() {
-        let wf = wf!(f64, 44100, sine!(500), square!(1000), sawtooth!(1500));
+        let wf = wf!(f64, 44100., sine!(500.), square!(1000.), sawtooth!(1500.));
         assert_eq!(3, wf.get_components_len());
     }
 

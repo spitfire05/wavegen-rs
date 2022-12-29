@@ -10,7 +10,7 @@ pub trait SampleType: NumCast + Bounded {}
 impl<T> SampleType for T where T: NumCast + Bounded {}
 
 /// Struct representing a waveform, consisting of output numeric type, sampling rate and a vector of [PeriodicFunction]s.
-pub struct Waveform<T: SampleType, P: Precision = f64> {
+pub struct Waveform<T: SampleType, P: Precision = f32> {
     sample_rate: P,
     components: Vec<PeriodicFunction<P>>,
     _phantom: PhantomData<T>,
@@ -230,7 +230,7 @@ mod tests {
 
     #[test]
     fn sine_waveform_has_default_amplitude_of_one() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1)]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1.)]);
 
         let samples = wf.iter().take(100).collect::<Vec<_>>();
 
@@ -240,7 +240,7 @@ mod tests {
 
     #[test]
     fn sine_waveform_as_integers_has_amplitude_of_one() {
-        let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1)]);
+        let wf = Waveform::<i32>::with_components(100.0, vec![sine!(1.)]);
 
         let samples = wf.iter().take(100).collect::<Vec<_>>();
 
@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn sine_waveform_with_bias_has_correct_amplitude() {
-        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1), dc_bias!(5, f64)]);
+        let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1.), dc_bias!(5.)]);
 
         let samples = wf.iter().take(100).collect::<Vec<_>>();
 
@@ -264,7 +264,7 @@ mod tests {
                 paste! {
                     #[test]
                     fn [<default_ $name _waveforom_has_no_bias>]() {
-                        let wf = Waveform::<f32>::with_components(100.0, vec![$func]);
+                        let wf = Waveform::<f32, f64>::with_components(100.0, vec![$func]);
 
                         let bias = wf.iter().take(100).sum::<f32>() / 100.0;
 
@@ -276,15 +276,25 @@ mod tests {
     }
 
     test_no_default_bias! {
-        sine: sine!(1)
+        sine: sine!(1.)
         // sawtooth: sawtooth!(1) // does not pass currently, see https://github.com/spitfire05/wavegen-rs/issues/17
-        square: square!(1)
+        square: square!(1.)
     }
 
     #[test]
     #[allow(clippy::iter_skip_next)]
-    fn waveform_iterator_is_infinite() {
-        let wf = Waveform::<f64>::new(f64::MIN_POSITIVE);
+    fn waveform_iterator_is_infinite_single() {
+        let wf = Waveform::<f64>::new(f32::MIN_POSITIVE);
+        let mut iter = wf.iter().skip(usize::MAX);
+
+        assert_eq!(Some(0f64), iter.next());
+        assert_eq!(Some(0f64), iter.skip(usize::MAX).next())
+    }
+
+    #[test]
+    #[allow(clippy::iter_skip_next)]
+    fn waveform_iterator_is_infinite_double() {
+        let wf = Waveform::<f64, f64>::new(f64::MIN_POSITIVE);
         let mut iter = wf.iter().skip(usize::MAX);
 
         assert_eq!(Some(0f64), iter.next());
@@ -293,7 +303,7 @@ mod tests {
 
     #[test]
     fn oversaturated_amplitude_clips_to_max() {
-        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(300, f64)]);
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(300.)]);
         let samples = wf.iter().take(1).collect::<Vec<_>>();
 
         assert_eq!(samples.len(), 1);
@@ -302,7 +312,7 @@ mod tests {
 
     #[test]
     fn undersaturated_amplitude_clips_to_min() {
-        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(-300, f64)]);
+        let wf = Waveform::<u8>::with_components(100.0, vec![dc_bias!(-300.)]);
         let samples = wf.iter().take(1).collect::<Vec<_>>();
 
         assert_eq!(samples.len(), 1);
@@ -332,11 +342,11 @@ mod tests {
     }
 
     test_wavefrom_panic! {
-        nan: f64::NAN
-        negative: -1f64
+        nan: f32::NAN
+        negative: -1f32
         zero: 0.0
-        infinity: f64::INFINITY
-        negative_infinity: f64::NEG_INFINITY
+        infinity: f32::INFINITY
+        negative_infinity: f32::NEG_INFINITY
     }
 
     macro_rules! test_size_hint {
@@ -356,15 +366,15 @@ mod tests {
     #[test]
     fn test_size_hint() {
         test_size_hint!();
-        test_size_hint!(sine!(50));
-        test_size_hint!(sine!(1), sawtooth!(2), square!(3), dc_bias!(4, f64));
+        test_size_hint!(sine!(50.));
+        test_size_hint!(sine!(1.), sawtooth!(2.), square!(3.), dc_bias!(4.));
     }
 
     #[test]
     #[allow(clippy::iter_nth_zero)]
     #[allow(clippy::unwrap_used)]
     fn nth_and_next_give_same_results() {
-        let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000, i32::MAX)]);
+        let wf = Waveform::<i32>::with_components(44100.0, vec![sine!(3000., i16::MAX)]);
         let mut i1 = wf.iter();
         let mut i2 = wf.iter();
 
