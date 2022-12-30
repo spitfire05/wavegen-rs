@@ -1,8 +1,9 @@
 # wavegen
 
-[![Crates.io](https://img.shields.io/crates/v/wavegen)](https://crates.io/crates/wavegen)
-[![docs](https://img.shields.io/docsrs/wavegen)](https://docs.rs/wavegen)
-[![Bors enabled](https://bors.tech/images/badge_small.svg)](https://app.bors.tech/repositories/46467)
+[![github](https://img.shields.io/badge/github-spitfire05/wavegen--rs-lightgrey?style=for-the-badge&logo=github)](https://github.com/spitfire05/wavegen-rs)
+[![Crates.io](https://img.shields.io/crates/v/wavegen?style=for-the-badge&logo=rust)](https://crates.io/crates/wavegen)
+[![docs](https://img.shields.io/docsrs/wavegen?style=for-the-badge&logo=docs.rs)](https://docs.rs/wavegen)
+[![Build status](https://img.shields.io/github/actions/workflow/status/spitfire05/wavegen-rs/check-build.yml?style=for-the-badge&branch=master)](https://github.com/spitfire05/wavegen-rs/actions/workflows/check-build.yml)
 
 `wavegen` is a wavefrom generator made with 🦀
 
@@ -12,28 +13,25 @@
 
 ```toml
 [dependencies]
-wavegen = "0.2"
+wavegen = "0.4"
 ```
-Or, to use the *no_std* version:
+Or, to use the *no_std* version (custom global allocator is required):
 
 ```toml
 [dependencies]
-wavegen = { version = "0.2", default-features = false, features = ["libm"] }
+wavegen = { version = "0.4", default-features = false, features = ["libm"] }
 ```
 
 2) Define a waveform with sampling frequency and function components:
 
 ```rust
-let wf = Waveform::<f64>::with_components(200.0, vec![
-        sine!(frequency: 100, amplitude: 10),
-        dc_bias!(20)
-    ]);
+let waveform = wf!(f64, 200., sine!(frequency: 100., amplitude: 10.), dc_bias!(20.));
 ```
 
 3) Turn it into an iterator and sample:
 
 ```rust
-let some_samples: Vec<f64> = wf.iter().take(200).collect();
+let some_samples: Vec<f64> = waveform.iter().take(200).collect();
 ```
 
 Refer to [documentation](https://docs.rs/wavegen) for more exhaustive usage examples.
@@ -76,6 +74,10 @@ Check out the demo at https://wavegen-demo.netlify.app
 
 All above examples are generated with simple program found in `examples/plot.rs`. Run `cargo run --example plot` to generate them yourself.
 
+## MSRV
+
+The *Minimum Supported Rust Version* is `1.60`.
+
 ## Similar crates
 * [Waver](https://github.com/amrali/waver/) which was the inspiration for this crate
 
@@ -83,4 +85,9 @@ All above examples are generated with simple program found in `examples/plot.rs`
 
 ### 0.2
 
-0.2 intorduces a braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
+- Braking change in how macros are annotated, changing the annotation form from `frequency = n` to `frequency: n`
+
+### 0.4
+
+- `Waveform::get_sample_rate` renamed to `Waveform::sample_rate` and now returns a borrowed values, as per rust API specs.
+- `Waveform::get_components_len` removed. The functionality can be achieved by a new getter `Waveform::components`.
