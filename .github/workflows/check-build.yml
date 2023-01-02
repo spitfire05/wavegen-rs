@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@miri
-      - run: cargo miri test
+      - run: cargo miri test --verbose
         env:
           MIRIFLAGS: -Zmiri-strict-provenance
 
