@@ -3,7 +3,7 @@ name: Rust
 on:
   pull_request:
     branches: [master]
-  workflow_dispatch:
+  schedule: [cron: "40 1 * * 5"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -34,7 +34,7 @@ jobs:
         run: cargo test --verbose ${{ matrix.build_args }}
       - name: Build examples
         if: matrix.toolchain == 'stable'
-        run: cargo build --verbose --examples
+        run: cargo build --verbose --examples ${{ matrix.build_args }}
 
   miri:
     runs-on: ubuntu-latest
@@ -64,3 +64,12 @@ jobs:
     steps:
       - name: Done
         run: echo Done
+
+  outdated:
+    name: Outdated
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/install@cargo-outdated
+      - run: cargo outdated --workspace --exit-code 1
