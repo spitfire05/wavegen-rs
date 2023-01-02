@@ -452,12 +452,9 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
         let phase = phase.into();
 
         Self::new(Box::new(move |t| {
-            let power = (P::two() * (t - phase) * frequency)
-                .floor()
-                .to_i32()
-                .unwrap_or(1); // TODO: is this safe enough?
+            let power = (P::two() * (t - phase) * frequency).floor();
 
-            amplitude * (P::one().neg()).powi(power)
+            amplitude * (P::one().neg()).powf(power)
         }))
     }
 
@@ -474,15 +471,19 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::{dc_bias, sawtooth, sine, square};
     use alloc::{vec, vec::Vec};
-
     use float_cmp::approx_eq;
     use paste::paste;
 
-    use super::Waveform;
-    use crate::{dc_bias, sawtooth, sine, square};
-
     const EPS: f32 = 1e-3;
+
+    #[test]
+    fn square_of_high_frequency() {
+        let square = PeriodicFunction::<f64>::square(u32::MAX, 1.0, 0.0);
+        assert!(square.sample(1.0).is_finite());
+    }
 
     #[test]
     fn sine_waveform_has_default_amplitude_of_one() {
