@@ -1,14 +1,13 @@
 name: Rust
 
 on:
-  push:
-    branches: [master, staging, trying]
   pull_request:
     branches: [master]
   workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
+  RUSTFLAGS: -Dwarnings
 
 jobs:
   build:
@@ -25,12 +24,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Install toolchain ${{ matrix.toolchain }}
-        run: |
-          rustup install ${{ matrix.toolchain }}
-          rustup override set ${{ matrix.toolchain }}
-      - name: Build
-        run: cargo build --verbose ${{ matrix.build_args }}
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - name: cargo check
+        run: cargo check --verbose ${{ matrix.build_args }}
       - name: Run tests
         if: matrix.toolchain == 'stable'
         run: cargo test --verbose ${{ matrix.build_args }}
@@ -38,24 +36,30 @@ jobs:
         if: matrix.toolchain == 'stable'
         run: cargo build --verbose --examples
 
+  miri:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@miri
+      - run: cargo miri test
+        env:
+          MIRIFLAGS: -Zmiri-strict-provenance
+
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install toolchain
-        run: |
-          rustup install stable
-          rustup override set stable
+      - uses: dtolnay/rust-toolchain@stable
       - name: Check code formatting
         run: cargo fmt -- --check
       - name: Run Clippy
-        run: cargo clippy -- --deny clippy::all
+        run: cargo clippy -- -Dclippy::all -Dclippy::pedantic
 
   # This job should depend on all required jobs.
   # We will make Bors watch this job to tell whether to merge or not.
   done:
     name: Done
-    needs: [build, lint]
+    needs: [build, miri, lint]
     runs-on: ubuntu-latest
     steps:
       - name: Done
