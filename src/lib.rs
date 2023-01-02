@@ -1,4 +1,4 @@
-//! Rust waveform generator, with [no_std support](https://github.com/spitfire05/wavegen-rs#how-to-use-it).
+//! Rust waveform generator, with [`no_std` support](https://github.com/spitfire05/wavegen-rs#how-to-use-it).
 //!
 //! # Quickstart
 //!
@@ -16,7 +16,7 @@
 //! Look into macros section for a complete list of defined periodic functions and their constructors.
 //!
 //! # Periodic function macros
-//! The macros for building predefined [PeriodicFunction]s generally have a form of:
+//! The macros for building predefined [`PeriodicFunction`]s generally have a form of:
 //!
 //! `function!(frequency, [amplitude, [phase]])`
 //!
@@ -156,7 +156,7 @@ impl<T> Two for T
 where
     T: One + Add<Output = T>,
 {
-    #[inline(always)]
+    #[inline]
     fn two() -> Self {
         T::one() + T::one()
     }
@@ -292,7 +292,7 @@ impl<T: SampleType, P: Precision> Waveform<T, P> {
         }
     }
 
-    #[inline(always)]
+    #[inline]
     fn assert_sane(x: P) {
         assert!(x.is_normal());
         assert!(x.is_sign_positive());
@@ -388,6 +388,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// ```
     /// let _ = wavegen::PeriodicFunction::new(Box::new(|x: f32| x.cos()));
     /// ```
+    #[must_use]
     pub fn new(f: Box<dyn Fn(P) -> P + Send + Sync>) -> Self {
         Self { inner: f }
     }
@@ -399,6 +400,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// ```
     /// let _ = wavegen::PeriodicFunction::custom(|x: f32| x.cos());
     /// ```
+    #[inline]
     pub fn custom<F: Fn(P) -> P + Send + Sync + 'static>(f: F) -> Self {
         Self::new(Box::new(f))
     }
@@ -406,6 +408,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// DC Bias function builder. See the [`macro`] for more info.
     ///
     /// [`macro`]: ../macro.dc_bias.html
+    #[inline]
     pub fn dc_bias(bias: impl Into<P>) -> Self {
         let bias = bias.into();
 
@@ -415,6 +418,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// Sawtooth function builder. See the [`macro`] for more info.
     ///
     /// [`macro`]: ../macro.sawtooth.html
+    #[inline]
     pub fn sawtooth(frequency: impl Into<P>, amplitude: impl Into<P>, phase: impl Into<P>) -> Self {
         let frequency = frequency.into();
         let amplitude = amplitude.into();
@@ -428,7 +432,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// Sine function builder. See the [`macro`] for more info.
     ///
     /// [`macro`]: ../macro.sine.html
-    #[inline(always)]
+    #[inline]
     pub fn sine(frequency: impl Into<P>, amplitude: impl Into<P>, phase: impl Into<P>) -> Self {
         let frequency = frequency.into();
         let amplitude = amplitude.into();
@@ -445,7 +449,7 @@ impl<P: Precision + 'static> PeriodicFunction<P> {
     /// Square function builder. See the [`macro`] for more info.
     ///
     /// [`macro`]: ../macro.square.html
-    #[inline(always)]
+    #[inline]
     pub fn square(frequency: impl Into<P>, amplitude: impl Into<P>, phase: impl Into<P>) -> Self {
         let frequency = frequency.into();
         let amplitude = amplitude.into();
@@ -486,6 +490,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn sine_waveform_has_default_amplitude_of_one() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1.)]);
 
@@ -506,6 +511,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn sine_waveform_with_bias_has_correct_amplitude() {
         let wf = Waveform::<f32>::with_components(100.0, vec![sine!(1.), dc_bias!(5.)]);
 
@@ -545,7 +551,7 @@ mod tests {
         let mut iter = wf.iter().skip(usize::MAX);
 
         assert_eq!(Some(0f64), iter.next());
-        assert_eq!(Some(0f64), iter.skip(usize::MAX).next())
+        assert_eq!(Some(0f64), iter.skip(usize::MAX).next());
     }
 
     #[test]
@@ -555,7 +561,7 @@ mod tests {
         let mut iter = wf.iter().skip(usize::MAX);
 
         assert_eq!(Some(0f64), iter.next());
-        assert_eq!(Some(0f64), iter.skip(usize::MAX).next())
+        assert_eq!(Some(0f64), iter.skip(usize::MAX).next());
     }
 
     #[test]

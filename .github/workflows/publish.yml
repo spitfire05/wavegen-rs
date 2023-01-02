@@ -2,18 +2,20 @@ name: Cargo publish
 on:
   push:
     # Pattern matched against refs/tags
-    tags:        
-      - '*'
+    tags:
+      - "*.*.*"
 
 env:
   CARGO_TERM_COLOR: always
+  RUSTFLAGS: -Dwarnings
 
-jobs:        
+jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Publish to crates.io
-      run: cargo publish --token ${CRATES_TOKEN}
-      env:
-        CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Publish to crates.io
+        run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

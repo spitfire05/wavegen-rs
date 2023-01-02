@@ -9,28 +9,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "sine.png",
         "Sine",
-        Waveform::with_components(sample_rate, vec![sine!(1.)]),
+        &Waveform::with_components(sample_rate, vec![sine!(1.)]),
     )?;
 
     draw(
         sample_rate,
         "sine_double.png",
         "Sines",
-        wf!(f32, sample_rate, sine!(1.0), sine!(1.0, 1.0, 0.25)),
+        &wf!(f32, sample_rate, sine!(1.0), sine!(1.0, 1.0, 0.25)),
     )?;
 
     draw(
         sample_rate,
         "sawtooth.png",
         "Sawtooth",
-        wf!(f32, sample_rate, sawtooth!(2., 1., 0.0)),
+        &wf!(f32, sample_rate, sawtooth!(2., 1., 0.0)),
     )?;
 
     draw(
         sample_rate,
         "sawtooth_sinesised.png",
         "Sawtooth with sine",
-        wf!(
+        &wf!(
             f32,
             sample_rate,
             sawtooth!(2., 1., 0.0),
@@ -42,14 +42,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "square.png",
         "Square",
-        wf!(f32, sample_rate, square!(2.)),
+        &wf!(f32, sample_rate, square!(2.)),
     )?;
 
     draw(
         sample_rate,
         "funky.png",
         "Something funky",
-        wf!(
+        &wf!(
             f32,
             sample_rate,
             sine!(10., 0.3),
@@ -62,7 +62,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         sample_rate,
         "sines_300_50_hz.png",
         "Sine 300Hz + 50 Hz",
-        wf!(
+        &wf!(
             f32,
             sample_rate,
             sine!(frequency: 300.),
@@ -77,8 +77,11 @@ fn draw(
     sample_rate: f32,
     path: impl AsRef<Path>,
     label: impl AsRef<str>,
-    waveform: Waveform<f32>,
+    waveform: &Waveform<f32>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    #![allow(clippy::cast_precision_loss)]
+    #![allow(clippy::cast_possible_truncation)]
+    #![allow(clippy::cast_sign_loss)]
     draw_internal(
         path,
         label.as_ref(),

@@ -30,17 +30,17 @@ fn sample_waveform<T: SampleType, P: Precision>(n: usize) -> Vec<T> {
 fn criterion_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("44.1 kHz 25000 samples");
     group.bench_function("f32 sample @ f32 precision", |b| {
-        b.iter(|| sample_waveform::<f32, f32>(black_box(25000)))
+        b.iter(|| sample_waveform::<f32, f32>(black_box(25000)));
     });
 
     group.bench_function("f32 sample @ f64 precision", |b| {
-        b.iter(|| sample_waveform::<f32, f64>(black_box(25000)))
+        b.iter(|| sample_waveform::<f32, f64>(black_box(25000)));
     });
     group.bench_function("f64 sample @ f32 precision", |b| {
-        b.iter(|| sample_waveform::<f64, f32>(black_box(25000)))
+        b.iter(|| sample_waveform::<f64, f32>(black_box(25000)));
     });
     group.bench_function("f64 sample @ f64 precision", |b| {
-        b.iter(|| sample_waveform::<f64, f64>(black_box(25000)))
+        b.iter(|| sample_waveform::<f64, f64>(black_box(25000)));
     });
     group.finish();
 }
