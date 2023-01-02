@@ -6,6 +6,8 @@ use wavegen::{sine, square, wf};
 const F_MAX: f32 = 350.0;
 const SAMPLE_RATE: f32 = F_MAX * 2.56;
 const N_SAMPLES: usize = 2048;
+
+#[allow(clippy::cast_precision_loss)]
 const SPECTRUM_RESOLUTION: f32 = SAMPLE_RATE / N_SAMPLES as f32;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,6 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut buffer: Vec<_> = samples.into_iter().map(|s| Complex::new(s, 0.)).collect();
     fft.process(&mut buffer);
 
+    #[allow(clippy::cast_precision_loss)]
     draw(
         "spectrum.png",
         "Spectrum",

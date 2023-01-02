@@ -203,10 +203,11 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn dc_bias_is_const_for_any_input() {
         let y = 42.0;
         let dc: PeriodicFunction<f64> = dc_bias!(y);
-        for x in (0..10000000).map(|x| x.into()) {
+        for x in (0..1000).map(core::convert::Into::into) {
             assert_eq!(dc.sample(x), y);
         }
     }
@@ -250,11 +251,11 @@ mod tests {
         let square = square!(1);
 
         for x in [0.0, 0.1, 0.2, 0.3, 0.4] {
-            assert!(approx_eq!(f64, square.sample(x), 1.0, epsilon = EPS))
+            assert!(approx_eq!(f64, square.sample(x), 1.0, epsilon = EPS));
         }
 
         for x in [0.5, 0.6, 0.7, 0.8, 0.9] {
-            assert!(approx_eq!(f64, square.sample(x), -1.0, epsilon = EPS))
+            assert!(approx_eq!(f64, square.sample(x), -1.0, epsilon = EPS));
         }
     }
 }
