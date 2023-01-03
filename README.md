@@ -2,8 +2,8 @@
 
 [![github](https://img.shields.io/badge/github-spitfire05/wavegen--rs-lightgrey?style=for-the-badge&logo=github)](https://github.com/spitfire05/wavegen-rs)
 [![Crates.io](https://img.shields.io/crates/v/wavegen?style=for-the-badge&logo=rust)](https://crates.io/crates/wavegen)
-[![docs](https://img.shields.io/docsrs/wavegen?style=for-the-badge&logo=docs.rs)](https://docs.rs/wavegen)
-[![Build status](https://img.shields.io/github/actions/workflow/status/spitfire05/wavegen-rs/check-build.yml?style=for-the-badge&branch=master)](https://github.com/spitfire05/wavegen-rs/actions/workflows/check-build.yml)
+[![docs](https://img.shields.io/docsrs/wavegen?style=for-the-badge&logo=docs.rs&label=docs.rs)](https://docs.rs/wavegen)
+[![Build status](https://img.shields.io/github/actions/workflow/status/spitfire05/wavegen-rs/check-build.yml?label=CI&style=for-the-badge&branch=master)](https://github.com/spitfire05/wavegen-rs/actions/workflows/check-build.yml)
 
 `wavegen` is a wavefrom generator made with 🦀
 
