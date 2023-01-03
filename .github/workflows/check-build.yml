@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [master]
   pull_request:
     branches: [master]
   schedule: [cron: "40 1 * * 5"]
@@ -26,7 +27,11 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           components: "clippy"
+      - name: Cargo check
+        if: matrix.toolchain != 'stable'
+        run: cargo check --verbose ${{ matrix.build_args }}
       - name: Clipy lints
+        if: matrix.toolchain == 'stable'
         run: cargo clippy --all-targets --verbose ${{ matrix.build_args }} -- -Dclippy::all -Dclippy::pedantic
       - name: Run tests
         if: matrix.toolchain == 'stable'
