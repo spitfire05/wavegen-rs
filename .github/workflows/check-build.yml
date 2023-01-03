@@ -1,6 +1,8 @@
-name: Rust
+name: CI
 
 on:
+  push:
+    branches: [master]
   pull_request:
     branches: [master]
   schedule: [cron: "40 1 * * 5"]
@@ -19,16 +21,18 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      RUSTFLAGS: "--deny warnings"
-
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
-      - name: cargo check
+          components: "clippy"
+      - name: Cargo check
+        if: matrix.toolchain != 'stable'
         run: cargo check --verbose ${{ matrix.build_args }}
+      - name: Clipy lints
+        if: matrix.toolchain == 'stable'
+        run: cargo clippy --all-targets --verbose ${{ matrix.build_args }} -- -Dclippy::all -Dclippy::pedantic
       - name: Run tests
         if: matrix.toolchain == 'stable'
         run: cargo test --verbose ${{ matrix.build_args }}
@@ -45,21 +49,21 @@ jobs:
         env:
           MIRIFLAGS: -Zmiri-strict-provenance
 
-  lint:
+  fmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: "rustfmt"
       - name: Check code formatting
         run: cargo fmt -- --check
-      - name: Run Clippy
-        run: cargo clippy -- -Dclippy::all -Dclippy::pedantic
 
   # This job should depend on all required jobs.
   # We will make Bors watch this job to tell whether to merge or not.
   done:
     name: Done
-    needs: [build, miri, lint]
+    needs: [build, miri, fmt]
     runs-on: ubuntu-latest
     steps:
       - name: Done
