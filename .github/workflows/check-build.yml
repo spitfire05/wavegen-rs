@@ -25,6 +25,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
+          components: "clippy"
       - name: Clipy lints
         run: cargo clippy --all-targets --verbose ${{ matrix.build_args }} -- -Dclippy::all -Dclippy::pedantic
       - name: Run tests
@@ -48,6 +49,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: "rustfmt"
       - name: Check code formatting
         run: cargo fmt -- --check
 
